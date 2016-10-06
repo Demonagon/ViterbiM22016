@@ -1,0 +1,17 @@
+A
+ADV
+C
+CL
+D
+ET
+I
+N
+P
+P+D
+P+PRO
+PC
+PONCT
+PRED
+PREF
+PRO
+V
