@@ -131,20 +131,23 @@ void print_hmm_verbose(Hmm *h, char *file_name)
   fprintf(f, "%d\n", h->nbo);
   fprintf(f, "#probabilites initiales\n");
   for(i=0; i < h->nbe; i++){
-    fprintf(f, "pi[%d] = %f\n", i, exp(h->PI[i]));
+    //fprintf(f, "pi[%d] = %f\n", i, exp(h->PI[i]));
+   fprintf(f, "pi[%d] = %f\n", i, h->PI[i]);
   }
 
   fprintf(f, "#probabilites de transition\n");
   for(i=0; i < h->nbe; i++){
     for(j=0; j < h->nbe; j++){
-      fprintf(f, "T[%d][%d] = %f\n", i, j, exp(h->T[i][j]));
+      //fprintf(f, "T[%d][%d] = %f\n", i, j, exp(h->T[i][j]));
+      fprintf(f, "T[%d][%d] = %f\n", i, j, h->T[i][j]);
     }
   }
 
   fprintf(f, "#probabilites d'emission\n");
   for(i=0; i < h->nbe; i++){
     for(j=0; j < h->nbo; j++){
-      fprintf(f, "E[%d][%d] = %f\n", i, j, exp(h->E[i][j]));
+      //fprintf(f, "E[%d][%d] = %f\n", i, j, exp(h->E[i][j]));
+      fprintf(f, "E[%d][%d] = %f\n", i, j, h->E[i][j]);
     }
   }
   if(file_name)

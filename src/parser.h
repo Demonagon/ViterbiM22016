@@ -45,6 +45,33 @@ int get_next_labeled_word(FILE * input, int * label);
 */
 int get_line_count(FILE * input);
 
+/**
+* La fonction suivante compte le nombre de lignes d'un fichier, en ignorant
+* les lignes vides.
+*/
+int get_text_line_count(FILE * input);
+
+/**
+* La fonction suivante compte le nombre de phrases de taille au moins 1.
+* Ce nombre est calculé par le nombre de lignes non vies suivies par une ligne
+* vide.
+*/
+int get_sentences_count(FILE * input);
+
+/**
+* La fonction suivante extrait les mots d'un corpus donné et renvoit un tableau
+* alloué dynamiquement les contenant de la taille précise.
+*/
+
+int * extract_words(FILE * corpus, int * size);
+
+/**
+* La fonction suivante extrait les étiquettes d'un corpus donné et renvoit un
+* tableau alloué dynamiquement les contenant de la taille précise.
+*/
+
+int * extract_labels(FILE * corpus, int * size);
+
 /* Fonctions de test */
 
 void main_test_parsing(char * file_name);

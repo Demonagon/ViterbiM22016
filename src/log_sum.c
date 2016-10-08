@@ -8,6 +8,10 @@ double log_probability_mult(double a, double b) {
 	return a + b;
 }
 
+double log_probability_mult3(double a, double b, double c) {
+	return a + b + c;
+}
+
 void main_test_log_01() {
 	int total = 10000;
 	int a = 2;

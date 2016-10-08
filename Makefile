@@ -11,7 +11,7 @@ BREP = bin
 #Nom de l'executable :
 BIN = hmm
 #Nom du compilateur :
-CC = gcc
+CC = clang
 
 INCLUDE = -I/usr/local/include -I/usr/include -lm
 FLAGS = -L/usr/local/lib -L/usr/lib -g -Wall -std=c99

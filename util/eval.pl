@@ -15,7 +15,7 @@ while(<REF>){
     ($word_hyp, $pos_hyp) = split / /, $hyp;
 #    print "word hyp = $word_hyp pos hyp = $pos_hyp\n";
     
-#    print "$word_ref $word_hyp\n";
+    print "$word_ref $word_hyp\n";
 
     if($word_ref != $word_hyp){
 	die "mismatch\n";

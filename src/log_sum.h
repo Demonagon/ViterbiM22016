@@ -32,6 +32,7 @@ double log_occurence_probability(int n, int total);
 * produit des probabilités via a + b.
 */
 double log_probability_mult(double a, double b);
+double log_probability_mult3(double a, double b, double c);
 
 /* Fonctions de test */
 

@@ -2,6 +2,10 @@
 #define __PARSER__
 
 #include "hmm_init.h"
+#include "viterbi.h"
+#include "parser.h"
+#include "parameters.h"
+#include "perceptron.h"
 
 /** Rédigé par Pacôme Perrotin
 *
