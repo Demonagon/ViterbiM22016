@@ -72,4 +72,6 @@ void print_parameters_note(FILE * out, char ** argv)
 	fprintf(out, "\t[...] - une liste optionnelle de paramètres parmis :\n");
 	fprintf(out, "\t\t\"-s\" - mode silencieux\n");
 	fprintf(out, "\t\t\"-v\" - mode détaillé\n");
+	fprintf(out, "\t\t\"-I=x\" - règle le nombre");
+	fprintf(out, " d'itérations de l'algorithme de Perceptron\n");
 }

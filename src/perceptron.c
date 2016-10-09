@@ -26,7 +26,7 @@ void update_emission(Hmm * hmm, int * words,
 					 int * real_labels, int * approximated_labels,
 					 int size) {
 	for(int word_index = 0; word_index < size; word_index++) {
-		int word = words[word_index];
+		int word = words[word_index] - 1;
 		int real_state = real_labels[word_index] - 1;
 		int approximated_state = approximated_labels[word_index] - 1;
 		hmm->E[real_state][word]--;
@@ -37,6 +37,8 @@ void update_emission(Hmm * hmm, int * words,
 void update_initial(Hmm * hmm, int * real_labels, int * approximated_labels) {
 	hmm->PI[real_labels[0] - 1]--;
 	hmm->PI[approximated_labels[0] - 1]++;
+	/*printf("PI[%d] --\n", real_labels[0] - 1);
+	printf("PI[%d] ++\n", approximated_labels[0] - 1);*/
 }
 
 void update_perceptron(Hmm * hmm, int * words, int * real_labels,
@@ -49,7 +51,7 @@ void update_perceptron(Hmm * hmm, int * words, int * real_labels,
 void perceptron_compute_corpus(Hmm * hmm, char * corpus_file) {
 	FILE * corpus = fopen(corpus_file, "r");
 
-	initialize_hmm(hmm);
+	//initialize_hmm(hmm);
 
 	int size = 0;
 
@@ -63,12 +65,21 @@ void perceptron_compute_corpus(Hmm * hmm, char * corpus_file) {
 
 	int approximated_labels[size];
 
+	printf("Calcul du perceptron : \n[");
+
+	fflush( stdout );
+
 	for(int i = 0; i < GLOBAL_PARAMETERS.perceptron_iteration_number; i++) {
+
+		printf(".");
+
+		fflush( stdout );
 
 		int k = 0;
 		int space = get_next_space(words, k, size);
 
-		while(k < size) {
+
+		while(k + 1 < size) {
 			predict_viterbi(hmm, words + k, approximated_labels + k, space - k);
 
 			/*printf("prediction = {\n");
@@ -86,4 +97,8 @@ void perceptron_compute_corpus(Hmm * hmm, char * corpus_file) {
 			space = get_next_space(words, k, size);
 		}
 	}
+
+	printf("]\n");
+
+	fflush(stdout);
 }

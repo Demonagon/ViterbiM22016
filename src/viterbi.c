@@ -5,6 +5,8 @@ double viterbi(char * train_corpus, char * test_corpus,
 	if( GLOBAL_PARAMETERS.noise >= LOUD )
 		printf("Entraînement sur %s...", train_corpus);
 
+	fflush(stdout);
+
 	Hmm * hmm = init_hmm_by_corpus();
 
 	generator(hmm, train_corpus);
@@ -13,6 +15,8 @@ double viterbi(char * train_corpus, char * test_corpus,
 		printf(" Terminé.\n");
 		printf("Prédiction sur %s.\n", test_corpus);
 	}
+
+	fflush(stdout);
 
 	double accuracy = predict_and_compare_viterbi(hmm, test_corpus);
 
@@ -32,6 +36,7 @@ void viterbi_initialization(Hmm * hmm, int * words, int size, double ** score,
 	for(int k = 0; k < hmm->nbe; k++) {
 		score[k][0] = log_probability_mult(hmm->PI[ k ],
 										   hmm->E[k][ first_word ]);
+		//printf("score[%d][0] = %lf\n", k, score[k][0]);
 		backtrack[k][0] = 0;
 	}
 }
@@ -81,6 +86,24 @@ void viterbi_recursion(Hmm * hmm, int * words, int size, double ** score,
 void viterbi_output(Hmm * hmm, int * labels, int size, double ** score,
 					int ** backtrack) {
 
+	/*printf("score : {\n");
+	for(int i = 0; i < hmm->nbe; i++) {
+		for(int j = 0; j < size; j++) {
+			printf("%3lf\t", score[i][j]);
+		}
+		printf("\n");
+	}
+	printf("}\n");
+
+	printf("Backtrack : {\n");
+	for(int i = 0; i < hmm->nbe; i++) {
+		for(int j = 0; j < size; j++) {
+			printf("%3d\t", backtrack[i][j]);
+		}
+		printf("\n");
+	}
+	printf("}\n");*/
+
 	int last_label = 0;
 	double last_label_score = INFINITY;
 
@@ -115,6 +138,11 @@ void predict_viterbi(Hmm * hmm, int * words, int * labels, int size)
 	viterbi_recursion(hmm, words, size, score, backtrack);
 
 	viterbi_output(hmm, labels, size, score, backtrack);
+
+	/*printf("== {");
+	for(int k = 0; k < size; k++)
+		printf("%d\t", labels[k]);
+	printf("}\n");*/
 
 	for(int k = 0; k < hmm->nbe; k++) {
 		free(score[k]);

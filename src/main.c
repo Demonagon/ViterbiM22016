@@ -10,11 +10,11 @@ int main(int argc, char ** argv) {
 
 	read_parameters(argc - 3, argv + 3);
 
-	/*double viterbi_accuracy = viterbi(argv[1], argv[2], compute_corpus);
+	double viterbi_accuracy = viterbi(argv[1], argv[2], compute_corpus);
 
 	if( GLOBAL_PARAMETERS.noise >= LOUD )
 		printf("Précision de viterbi par fréquence relative = %lf\n",
-				viterbi_accuracy);*/
+				viterbi_accuracy);
 
 	double perceptron_accuracy = viterbi(argv[1], argv[2],
 				perceptron_compute_corpus);
