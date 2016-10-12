@@ -30,17 +30,18 @@ typedef struct {
 	int ** transition_occurences;
 	int ** emission_occurences;
 	int * category_occurences;
+
+	GlobalData * data;
 } CorpusAnalyser;
 
 void init_corpus_analyser(CorpusAnalyser * ca, int states_nb,
-						  int observables_nb);
+						  int observables_nb, GlobalData * data);
 
 void free_corpus_analyser(CorpusAnalyser * ca);
 
 void analyse_sentence(CorpusAnalyser * ca, int * words, int * label, int size);
 
-void analyse_corpus(CorpusAnalyser * ca, char * corpus_file,
-					double corpus_size);
+void analyse_corpus(CorpusAnalyser * ca);
 
 void extract_hmm(CorpusAnalyser * ca, Hmm * hmm);
 
@@ -58,6 +59,6 @@ Hmm * init_hmm_by_corpus();
 * corpus_size.
 */
 
-void compute_corpus(Hmm * hmm, char * corpus_file_name, double corpus_size);
+void compute_corpus(Hmm * hmm);
 
 #endif

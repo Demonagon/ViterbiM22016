@@ -1,31 +1,26 @@
 #include "viterbi.h"
 
-double viterbi(char * train_corpus, char * test_corpus,
-			   HmmGenerator generator) {
-	if( can_speak() )
-		printf("Entraînement sur %s...\n", train_corpus);
+double viterbi(HmmGenerator generator, GlobalData * data) {
+	if( can_speak(data) )
+		printf("Entraînement...\n");
 
 	fflush(stdout);
 
 	Hmm * hmm = init_hmm_by_corpus();
+	hmm->data = data;
 
-	generator(hmm, train_corpus, GLOBAL_PARAMETERS.corpus_size);
+	generator(hmm);
 
-	if( can_speak() ) {
+	if( can_speak(data) ) {
 		printf("Terminé.\n");
-		printf("Prédiction sur %s...\n", test_corpus);
+		printf("Test...\n");
 	}
 
 	fflush(stdout);
 
-	if( can_speak() ) {
-		printf("Terminé.\n");
-		printf("Évaluation...\n");
-	}
+	double accuracy = predict_and_compare_viterbi(hmm);
 
-	double accuracy = predict_and_compare_viterbi(hmm, test_corpus);
-
-	if( can_speak() )
+	if( can_speak(data) )
 		printf("Terminé.\n");
 
 	free_hmm(hmm);
@@ -91,24 +86,6 @@ void viterbi_recursion(Hmm * hmm, int * words, int size, double ** score,
 
 void viterbi_output(Hmm * hmm, int * labels, int size, double ** score,
 					int ** backtrack) {
-	/*
-	printf("score : {\n");
-	for(int i = 0; i < hmm->nbe; i++) {
-		for(int j = 0; j < size; j++) {
-			printf("%3lf\t", score[i][j]);
-		}
-		printf("\n");
-	}
-	printf("}\n");
-
-	printf("Backtrack : {\n");
-	for(int i = 0; i < hmm->nbe; i++) {
-		for(int j = 0; j < size; j++) {
-			printf("%3d\t", backtrack[i][j]);
-		}
-		printf("\n");
-	}
-	printf("}\n");//*/
 
 	int last_label = 0;
 	double last_label_score = INFINITY;
@@ -154,23 +131,14 @@ void predict_viterbi(Hmm * hmm, int * words, int * labels, int size)
 	free( backtrack );
 }
 
-double predict_and_compare_viterbi(Hmm * hmm, char * file_name) {
-	FILE * test_corpus = fopen(file_name, "r");
+double predict_and_compare_viterbi(Hmm * hmm) {
+	GlobalData * data = hmm->data;
 
-	int size = 0;
+	int size = data->test_size;
+	int * words = data->test_words;
 
-	int * words;
-	int * real_labels;
-
-	if( can_speak() ) {
-		printf(" - > Extraction des mots étiquetés...\n");
-		fflush( stdout );
-	}
-
-	extract_labels_and_words(test_corpus, &words, &real_labels, &size);
-
-	if( can_speak() ) {
-		printf(" - > Terminé.\n - > Étiquetage...\n");
+	if( can_speak(data) ) {
+		printf(" - > Étiquetage...\n");
 		fflush( stdout );
 	}
 
@@ -186,17 +154,12 @@ double predict_and_compare_viterbi(Hmm * hmm, char * file_name) {
 		space = get_next_space(words, k, size);
 	}
 
-	if( can_speak() ) {
+	if( can_speak(data) ) {
 		printf(" - > Terminé.\n");
 		fflush( stdout );
 	}
 
-	double accuracy = compare_labels_results(words, real_labels,
-											 approximated_labels, size);
-
-	fclose(test_corpus);
-	free(words);
-	free(real_labels);
+	double accuracy = compare_labels_results(data, approximated_labels);
 
 	return accuracy;
 }

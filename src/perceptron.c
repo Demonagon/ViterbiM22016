@@ -48,45 +48,34 @@ void update_perceptron(Hmm * hmm, int * words, int * real_labels,
 	update_initial(hmm, real_labels, approximated_labels);
 }
 
-void perceptron_compute_corpus(Hmm * hmm, char * corpus_file,
-							   double corpus_size) {
-	FILE * corpus = fopen(corpus_file, "r");
+void perceptron_compute_corpus(Hmm * hmm) {
+	GlobalData * data = hmm->data;
 
-	int size = 0;
+	int size = data->learning_size;
+	int * words = data->learning_words;
+	int * real_labels = data->learning_labels;
 
-	if( can_speak() ) {
-		printf(" - > Extraction des mots étiquetés...\n");
-		fflush( stdout );
-	}
-
-	int * words;
-	int * real_labels;
-
-	int sentence_count = extract_labels_and_words(corpus,
-												  &words, &real_labels, &size);
-
-	fclose(corpus);
-
-	if( can_speak() ) {
-		printf(" - > Terminé.\n - > Exécution de l'algorithme perceptron...\n");
+	if( can_speak(data) ) {
+		printf("- > Exécution de l'algorithme perceptron...\n");
 		fflush( stdout );
 	}
 
 	int approximated_labels[size];
 
-	int I = GLOBAL_PARAMETERS.perceptron_iteration_number;
+	int I = data->execution_parameters.perceptron_iteration_number;
 
 	int progress_state = 0;
 	int progress_length = 10;
 
-	if( can_speak() ) {
+	if( can_speak(data) ) {
 		printf("\t0%%...   ");
 		fflush( stdout );
 	}
 
 	for(int i = 0; i < I; i++) {
 
-		while( i / (double) I > progress_state / (double) progress_length ) {
+		while( i / (double) I > progress_state / (double) progress_length
+			   && can_speak(data) ) {
 			progress_state++;
 			printf("%d0%%...   ", progress_state);
 			fflush( stdout );
@@ -95,16 +84,8 @@ void perceptron_compute_corpus(Hmm * hmm, char * corpus_file,
 		int k = 0;
 		int space = get_next_space(words, k, size);
 
-		int sentences_to_read = (int) ( sentence_count * corpus_size );
-		int sentences_read = 0;
-
-		while(k + 1 < size && sentences_read < sentences_to_read ) {
+		while(k + 1 < size) {
 			predict_viterbi(hmm, words + k, approximated_labels + k, space - k);
-
-			/*printf("prediction = {\n");
-			for(int l = 0; l < space - k; l++)
-				printf("%d %d\n", (words + k)[l], (approximated_labels + k)[l]);
-			printf("}\n");*/
 
 			if( is_prediction_wrong_perceptron(
 				real_labels + k, approximated_labels + k, space - k) )
@@ -114,16 +95,11 @@ void perceptron_compute_corpus(Hmm * hmm, char * corpus_file,
 			k = space + 1;
 			approximated_labels[space] = 0;
 			space = get_next_space(words, k, size);
-
-			sentences_read++;
 		}
 	}
 
-	if( can_speak() ) {
+	if( can_speak(data) ) {
 		printf("100%%\n");
 		fflush( stdout );
 	}
-
-	free(words);
-	free(real_labels);
 }

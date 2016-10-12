@@ -136,8 +136,8 @@ int * extract_labels(FILE * corpus, int * size) {
 	return labels;
 }
 
-int extract_labels_and_words(FILE * corpus, int ** words, int ** labels,
-							  int * size) {
+int extract_labels_and_words(GlobalData * data, FILE * corpus, int ** words,
+							int ** labels, int * size, double corpus_size) {
 	static char line[LINE_LENGTH];
 	int sentences_count = 0;
 	char last_sentence_was_empty = 1;
@@ -151,19 +151,49 @@ int extract_labels_and_words(FILE * corpus, int ** words, int ** labels,
 
 	int k = 0;
 
+	int progress_state = 0;
+	int progress_length = 10;
+
+	if( can_speak(data) ) {
+		printf("\t");
+		fflush( stdout );
+	}
+
 	while( ! feof(corpus) ) {
+
+		while( k / (double) *size > progress_state / (double) progress_length
+			   && can_speak(data) ) {
+			printf("%d%%...   ", progress_state * 10);
+			progress_state++;
+			fflush( stdout );
+		}
+	
 		get_line(corpus, line);
 
 		if( sscanf(line, "%d %d", (*words) + k, (*labels) + k) != 2 ) {
 			(*labels)[k] = 0;
 			(*words)[k] = 0;
-			if( ! last_sentence_was_empty ) sentences_count++;
+			if( ! last_sentence_was_empty ) {
+				sentences_count++;
+				if( k >= ( *size * corpus_size ) ) {
+					if( feof(corpus) ) break;
+					*size = k + 2;
+					(*labels)[k + 1] = 0;
+					(*words)[k + 1] = 0;
+					break;
+				}
+			}
 			last_sentence_was_empty = 1;
 		}
 		else
 			last_sentence_was_empty = 0;
 
 		k++;
+	}
+
+	if( can_speak(data) ) {
+		printf("100%%\n");
+		fflush( stdout );
 	}
 
 	return sentences_count;

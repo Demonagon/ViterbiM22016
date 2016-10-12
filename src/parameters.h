@@ -38,20 +38,10 @@ typedef struct {
 	double smoothing_value;
 } GlobalParameters;
 
-/**
-* GLOBAL_PARAMETERS est une variable accessible en tout point du programme qui
-* stocke les paramètres en question.
-*/
+//extern GlobalParameters GLOBAL_PARAMETERS;
 
-extern GlobalParameters GLOBAL_PARAMETERS;
-
-void read_parameters(int argc, char ** argv);
-
-void configure_parameters(GlobalParameters configuration);
+void read_parameters(GlobalParameters * parameter, int argc, char ** argv);
 
 void print_parameters_note(FILE * out, char ** argv);
-
-char can_speak();
-char can_shout();
 
 #endif

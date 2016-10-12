@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "data.h"
 /*#include"matrices.h"*/
 /*#include"somme_log.h"*/
 
@@ -23,11 +24,13 @@ typedef struct
   double *PI; /* matrice des probabilites initiales PI[i] = P(X0 = i)*/
               /* probabilite que le Hmm se trouve dans l'etat i au debut */ 
               /* de la generation */
+
+	GlobalData * data;
 } Hmm;
 
 
 Hmm *allocate_hmm(int nbe, int nbo);
-void initialize_hmm(Hmm *h);
+void initialize_hmm(Hmm *h, GlobalData * data);
 void print_hmm(Hmm *h, char *file_name);
 void print_hmm_verbose(Hmm *h, char *file_name);
 Hmm *load_hmm(char *file_name);

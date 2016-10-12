@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "data.h"
 
 #define LINE_LENGTH 1024
 
@@ -77,8 +78,8 @@ int * extract_labels(FILE * corpus, int * size);
 * dessus, en un seul parcours du fichier.
 * Retourne également le nombre de phrases lues.
 */
-int extract_labels_and_words(FILE * corpus, int ** words, int ** labels,
-							  int * size);
+int extract_labels_and_words(GlobalData * data, FILE * corpus, int ** words, int ** labels,
+							  int * size, double corpus_size);
 
 /* Fonctions de test */
 

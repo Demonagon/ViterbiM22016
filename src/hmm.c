@@ -12,6 +12,7 @@ void free_hmm(Hmm *h)
   free(h->T);
   free(h->E);
   free(h->PI);
+
   free(h);
 }
 
@@ -68,9 +69,11 @@ Hmm *allocate_hmm(int nbe, int nbo)
   return h;
 }
 
-void initialize_hmm(Hmm *h)
+void initialize_hmm(Hmm *h, GlobalData * data)
 {
   int  i,j;
+
+	h->data = data;
 
   for(i=0; i < h->nbe; i++){
     h->PI[i] = 0;

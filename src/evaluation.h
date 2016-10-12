@@ -1,7 +1,7 @@
 #ifndef __EVALUATION__
 #define __EVALUATION__
 
-#include "parameters.h"
+#include "data.h"
 #include <stdio.h>
 
 /** Rédigé par Pacôme Perrotin
@@ -11,13 +11,10 @@
 */
 
 /**
-* La fonction suivante compare les deux tableaux d'étiquettes en paramètres
-* pour estimer et afficher l'erreur de calcul.
+* La fonction suivante compare le tableau d'étiquettes en paramètres avec
+* celui du fichier de test pour donner la précision du résultat.
 */
 
-double compare_labels_results(int * words,
-							  int * real_labels,
-							  int * approximated_labels,
-							  int size);
+double compare_labels_results(GlobalData * data, int * approximated_labels);
 
 #endif

@@ -1,7 +1,5 @@
 #include "parameters.h"
 
-GlobalParameters GLOBAL_PARAMETERS;
-
 /** LECTURE DES PARAMETRES **/
 
 void read_help_parameter(char ** argv) {
@@ -102,7 +100,7 @@ void read_parameter(GlobalParameters * configuration, char * parameter,
 		read_smoothing_parameter(configuration, a);
 }
 
-void read_parameters(int argc, char ** argv)
+void read_parameters(GlobalParameters * parameter, int argc, char ** argv)
 {
 	if( argc < 3 ) {
 		fprintf(stdout, "Pas assez d'arguments pour exécuter le programme.\n");
@@ -113,7 +111,7 @@ void read_parameters(int argc, char ** argv)
 	argc -= 3;
 	argv += 3;
 
-	GlobalParameters configuration = (GlobalParameters) {
+	* parameter = (GlobalParameters) {
 		.noise = LOUD,
 		.execution = EXECUTE_ALL,
 		.corpus_size = 1.,
@@ -122,14 +120,7 @@ void read_parameters(int argc, char ** argv)
 	};
 
 	for(int k = 0; k < argc; k++)
-		read_parameter(&configuration, argv[k], argv);
-
-	configure_parameters(configuration);
-}
-
-void configure_parameters(GlobalParameters configuration)
-{
-	GLOBAL_PARAMETERS = configuration;
+		read_parameter(parameter, argv[k], argv);
 }
 
 void print_parameters_note(FILE * out, char ** argv)
@@ -151,12 +142,4 @@ void print_parameters_note(FILE * out, char ** argv)
 	fprintf(out, " de lissage des données probabilistes\n");
 	fprintf(out, "* \t\t\"-h\" ou \"--help\" - affiche cette aide à la place");
 	fprintf(out, " d'exécuter le programme\n");
-}
-
-char can_speak() {
-	return GLOBAL_PARAMETERS.noise >= LOUD;
-}
-
-char can_shout() {
-	return GLOBAL_PARAMETERS.noise >= VERBOSE;
 }

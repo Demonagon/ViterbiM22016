@@ -1,7 +1,7 @@
 #include "hmm_init.h"
 
 void init_corpus_analyser(CorpusAnalyser * ca, int states_nb,
-						  int observables_nb)
+						  int observables_nb, GlobalData * data)
 {
 	ca->states_nb = states_nb;
 	ca->observables_nb = observables_nb;
@@ -34,6 +34,8 @@ void init_corpus_analyser(CorpusAnalyser * ca, int states_nb,
 	for(int i = 0; i < states_nb; i++)
 		for(int j = 0; j < observables_nb; j++)
 			ca->emission_occurences[i][j] = 0;
+
+	ca->data = data;
 }
 
 void free_corpus_analyser(CorpusAnalyser * ca) {
@@ -72,31 +74,20 @@ void analyse_sentence(CorpusAnalyser * ca, int * words, int * labels, int size)
 	ca->sentences++;
 }
 
-void analyse_corpus(CorpusAnalyser * ca, char * corpus_file, double corpus_size)
+void analyse_corpus(CorpusAnalyser * ca)
 {
-	FILE * corpus = fopen(corpus_file, "r");
+	GlobalData * data = ca->data;
 
-	int size = 0;
+	int size = data->learning_size;
+	int * words = data->learning_words;
+	int * labels = data->learning_labels;
 
-	if( can_speak() ) {
-		printf(" - > Extraction des mots étiquetés...\n");
+	if( can_speak(data) ) {
+		printf(" - > Comptage des occurences...\n");
 		fflush( stdout );
 	}
 
-	int * words;
-	int * labels;
-
-	int sentence_count = extract_labels_and_words(corpus,
-												  &words, &labels, &size);
-
-	fclose(corpus);
-
-	if( can_speak() ) {
-		printf(" - > Terminé.\n - > Comptage des occurences...\n");
-		fflush( stdout );
-	}
-
-	if( can_shout() ) {
+	if( can_shout(data) ) {
 		printf("\t[");
 		fflush( stdout );
 	}
@@ -104,11 +95,8 @@ void analyse_corpus(CorpusAnalyser * ca, char * corpus_file, double corpus_size)
 	int k = 0;
 	int space = get_next_space(words, k, size);
 
-	int sentences_to_read = (int) ( sentence_count * corpus_size );
-	int sentences_read = 0;
-
-	while(k + 1 < size && sentences_read < sentences_to_read) {
-		if( can_shout() ) {
+	while(k + 1 < size) {
+		if( can_shout(data) ) {
 			printf(".");
 			fflush( stdout );
 		}
@@ -117,26 +105,21 @@ void analyse_corpus(CorpusAnalyser * ca, char * corpus_file, double corpus_size)
 
 		k = space + 1;
 		space = get_next_space(words, k, size);
-
-		sentences_read++;
 	}
 
-	if( can_shout() ) {
+	if( can_shout(data) ) {
 		printf("]\n");
 		fflush( stdout );
 	}
 
-	if( can_speak() ) {
+	if( can_speak(data) ) {
 		printf(" - > Terminé.\n");
 		fflush( stdout );
 	}
-
-	free(words);
-	free(labels);
 }
 
 void extract_hmm(CorpusAnalyser * ca, Hmm * hmm) {
-	double smoothing_value = GLOBAL_PARAMETERS.smoothing_value;
+	double smoothing_value = hmm->data->execution_parameters.smoothing_value;
 
 	for(int k = 0; k < ca->states_nb; k++) {
 		hmm->PI[k] = log_occurence_probability(
@@ -162,7 +145,7 @@ void extract_hmm(CorpusAnalyser * ca, Hmm * hmm) {
 
 }
 
-Hmm * init_hmm_by_corpus() {
+Hmm * init_hmm_by_corpus(GlobalData * data) {
 	int state_nb, word_nb;
 
 	FILE * f = fopen("data/voc_etats.txt", "r");
@@ -175,17 +158,17 @@ Hmm * init_hmm_by_corpus() {
 
 	Hmm * hmm = allocate_hmm(state_nb, word_nb);
 
-	initialize_hmm(hmm);
+	initialize_hmm(hmm, data);
 
 	return hmm;
 }
 
-void compute_corpus(Hmm * hmm, char * corpus_file_name, double corpus_size) {
+void compute_corpus(Hmm * hmm) {
 	CorpusAnalyser ca;
 
-	init_corpus_analyser(&ca, hmm->nbe, hmm->nbo);
+	init_corpus_analyser(&ca, hmm->nbe, hmm->nbo, hmm->data);
 
-	analyse_corpus(&ca, corpus_file_name, corpus_size);
+	analyse_corpus(&ca);
 
 	extract_hmm(&ca, hmm);
 

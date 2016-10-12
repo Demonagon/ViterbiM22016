@@ -2,25 +2,27 @@
 
 
 int main(int argc, char ** argv) {
-	read_parameters(argc, argv);
+	GlobalData data;
+	init_data(&data, argc, argv);
 
-	ExecutionParameter execution = GLOBAL_PARAMETERS.execution;
+	ExecutionParameter execution = data.execution_parameters.execution;
 
 	if( execution == COUNT || execution == EXECUTE_ALL ) {
-		double viterbi_accuracy = viterbi(argv[1], argv[2], compute_corpus);
+		double viterbi_accuracy = viterbi(compute_corpus, &data);
 
-		if( can_speak() )
+		if( can_speak(&data) )
 			printf("Précision de viterbi par fréquence relative = %lf\n",
 					viterbi_accuracy);
 	}
 	if( execution == PERCEPTRON || execution == EXECUTE_ALL ) {
-		double perceptron_accuracy = viterbi(argv[1], argv[2],
-					perceptron_compute_corpus);
+		double perceptron_accuracy = viterbi(perceptron_compute_corpus, &data);
 
-		if( can_speak() )
+		if( can_speak(&data) )
 			printf("Précision de viterbi par preceptron = %lf\n",
 					perceptron_accuracy);
 	}
+
+	free_data(&data);
 
 	return 0;
 }

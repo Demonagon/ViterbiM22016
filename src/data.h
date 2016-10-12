@@ -1,7 +1,9 @@
 #ifndef __DATA__
 #define __DATA__
 
-#include "parameter.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "parameters.h"
 
 /** Rédigé par Pacôme Perrotin
 * Ce module a pour mission de fournir une structure de donnée capable de
@@ -18,9 +20,11 @@ typedef struct {
 	int * learning_words;
 	int * learning_labels;
 	int   learning_size;
+	int   learning_sentences_count;
 	int * test_words;
 	int * test_labels;
 	int   test_size;
+	int   test_sentences_count;
 } GlobalData;
 
 /**
@@ -40,13 +44,23 @@ void extract_data(GlobalData * data, char * learning_file, char * test_file);
 * Fonctions dont le rôle accumulé correspond à celui de la fonction du dessus.
 */
 
-void extract_learning_data(Global * data, char * learning_file);
-void extract_test_data(Global * data, char * test_file);
+void extract_learning_data(GlobalData * data, char * learning_file);
+void extract_test_data(GlobalData * data, char * test_file);
 
 /**
 * Libère la mémoire occupée par la structure.
 */
 
 void free_data(GlobalData * data);
+
+
+/**
+* Ces fonctions sont des raccourcis pratiques permettant de savoir en un court
+* appel si l'on a le droit d'afficher un message en fonction des paramètres
+* silent et verbose.
+*/
+
+char can_speak(GlobalData * data);
+char can_shout(GlobalData * data);
 
 #endif
