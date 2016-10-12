@@ -72,6 +72,14 @@ int * extract_words(FILE * corpus, int * size);
 
 int * extract_labels(FILE * corpus, int * size);
 
+/**
+* La fonction suivante effectue le même travail que les deux fonctions du
+* dessus, en un seul parcours du fichier.
+* Retourne également le nombre de phrases lues.
+*/
+int extract_labels_and_words(FILE * corpus, int ** words, int ** labels,
+							  int * size);
+
 /* Fonctions de test */
 
 void main_test_parsing(char * file_name);

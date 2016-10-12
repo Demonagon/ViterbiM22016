@@ -1,17 +1,14 @@
 #ifndef __HMM__
 #define __HMM__
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 /*#include"matrices.h"*/
 /*#include"somme_log.h"*/
 
 #define LONG_LIGNE 100
 #define MINUS_INF -999999999.0
-
-#define cursortoxy(x,y) printf("\033[%d;%dH", (x), (y))
-#define moveright() printf("\033[XC")
 
 
 typedef struct

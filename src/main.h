@@ -6,6 +6,7 @@
 #include "parser.h"
 #include "parameters.h"
 #include "perceptron.h"
+#include "log_sum.h"
 
 /** Rédigé par Pacôme Perrotin
 *

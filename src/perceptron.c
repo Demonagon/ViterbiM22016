@@ -48,38 +48,57 @@ void update_perceptron(Hmm * hmm, int * words, int * real_labels,
 	update_initial(hmm, real_labels, approximated_labels);
 }
 
-void perceptron_compute_corpus(Hmm * hmm, char * corpus_file) {
+void perceptron_compute_corpus(Hmm * hmm, char * corpus_file,
+							   double corpus_size) {
 	FILE * corpus = fopen(corpus_file, "r");
-
-	//initialize_hmm(hmm);
 
 	int size = 0;
 
-	int * words = extract_words(corpus, &size);
+	if( can_speak() ) {
+		printf(" - > Extraction des mots étiquetés...\n");
+		fflush( stdout );
+	}
 
-	rewind(corpus);
+	int * words;
+	int * real_labels;
 
-	int * real_labels = extract_labels(corpus, &size);
+	int sentence_count = extract_labels_and_words(corpus,
+												  &words, &real_labels, &size);
 
 	fclose(corpus);
 
+	if( can_speak() ) {
+		printf(" - > Terminé.\n - > Exécution de l'algorithme perceptron...\n");
+		fflush( stdout );
+	}
+
 	int approximated_labels[size];
 
-	printf("Calcul du perceptron : \n[");
+	int I = GLOBAL_PARAMETERS.perceptron_iteration_number;
 
-	fflush( stdout );
+	int progress_state = 0;
+	int progress_length = 10;
 
-	for(int i = 0; i < GLOBAL_PARAMETERS.perceptron_iteration_number; i++) {
-
-		printf(".");
-
+	if( can_speak() ) {
+		printf("\t0%%...   ");
 		fflush( stdout );
+	}
+
+	for(int i = 0; i < I; i++) {
+
+		while( i / (double) I > progress_state / (double) progress_length ) {
+			progress_state++;
+			printf("%d0%%...   ", progress_state);
+			fflush( stdout );
+		}
 
 		int k = 0;
 		int space = get_next_space(words, k, size);
 
+		int sentences_to_read = (int) ( sentence_count * corpus_size );
+		int sentences_read = 0;
 
-		while(k + 1 < size) {
+		while(k + 1 < size && sentences_read < sentences_to_read ) {
 			predict_viterbi(hmm, words + k, approximated_labels + k, space - k);
 
 			/*printf("prediction = {\n");
@@ -95,10 +114,16 @@ void perceptron_compute_corpus(Hmm * hmm, char * corpus_file) {
 			k = space + 1;
 			approximated_labels[space] = 0;
 			space = get_next_space(words, k, size);
+
+			sentences_read++;
 		}
 	}
 
-	printf("]\n");
+	if( can_speak() ) {
+		printf("100%%\n");
+		fflush( stdout );
+	}
 
-	fflush(stdout);
+	free(words);
+	free(real_labels);
 }

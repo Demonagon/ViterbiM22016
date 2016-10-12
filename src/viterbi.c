@@ -2,25 +2,30 @@
 
 double viterbi(char * train_corpus, char * test_corpus,
 			   HmmGenerator generator) {
-	if( GLOBAL_PARAMETERS.noise >= LOUD )
-		printf("Entraînement sur %s...", train_corpus);
+	if( can_speak() )
+		printf("Entraînement sur %s...\n", train_corpus);
 
 	fflush(stdout);
 
 	Hmm * hmm = init_hmm_by_corpus();
 
-	generator(hmm, train_corpus);
+	generator(hmm, train_corpus, GLOBAL_PARAMETERS.corpus_size);
 
-	if( GLOBAL_PARAMETERS.noise >= LOUD ) {
-		printf(" Terminé.\n");
-		printf("Prédiction sur %s.\n", test_corpus);
+	if( can_speak() ) {
+		printf("Terminé.\n");
+		printf("Prédiction sur %s...\n", test_corpus);
 	}
 
 	fflush(stdout);
 
+	if( can_speak() ) {
+		printf("Terminé.\n");
+		printf("Évaluation...\n");
+	}
+
 	double accuracy = predict_and_compare_viterbi(hmm, test_corpus);
 
-	if( GLOBAL_PARAMETERS.noise >= LOUD )
+	if( can_speak() )
 		printf("Terminé.\n");
 
 	free_hmm(hmm);
@@ -64,9 +69,10 @@ int viterbi_arg_min_k(Hmm * hmm, int i, int state, double ** score) {
 		double k_score = log_probability_mult(
 				score[k][i - 1],
 				hmm->T[k][state]);
-		if( k_score < min_k_score )
+		if( k_score < min_k_score ) {
 			min_k = k;
 			min_k_score = k_score;
+		}
 	}
 
 	return min_k;
@@ -85,8 +91,8 @@ void viterbi_recursion(Hmm * hmm, int * words, int size, double ** score,
 
 void viterbi_output(Hmm * hmm, int * labels, int size, double ** score,
 					int ** backtrack) {
-
-	/*printf("score : {\n");
+	/*
+	printf("score : {\n");
 	for(int i = 0; i < hmm->nbe; i++) {
 		for(int j = 0; j < size; j++) {
 			printf("%3lf\t", score[i][j]);
@@ -102,13 +108,13 @@ void viterbi_output(Hmm * hmm, int * labels, int size, double ** score,
 		}
 		printf("\n");
 	}
-	printf("}\n");*/
+	printf("}\n");//*/
 
 	int last_label = 0;
 	double last_label_score = INFINITY;
 
 	for(int k = 0; k < hmm->nbe; k++)
-		if( score[k][size - 1] <= last_label_score ) {
+		if( score[k][size - 1] < last_label_score ) {
 			last_label = k;
 			last_label_score = score[k][size - 1];
 		}
@@ -139,11 +145,6 @@ void predict_viterbi(Hmm * hmm, int * words, int * labels, int size)
 
 	viterbi_output(hmm, labels, size, score, backtrack);
 
-	/*printf("== {");
-	for(int k = 0; k < size; k++)
-		printf("%d\t", labels[k]);
-	printf("}\n");*/
-
 	for(int k = 0; k < hmm->nbe; k++) {
 		free(score[k]);
 		free(backtrack[k]);
@@ -158,11 +159,20 @@ double predict_and_compare_viterbi(Hmm * hmm, char * file_name) {
 
 	int size = 0;
 
-	int * words = extract_words(test_corpus, &size);
+	int * words;
+	int * real_labels;
 
-	rewind(test_corpus);
+	if( can_speak() ) {
+		printf(" - > Extraction des mots étiquetés...\n");
+		fflush( stdout );
+	}
 
-	int * real_labels = extract_labels(test_corpus, &size);
+	extract_labels_and_words(test_corpus, &words, &real_labels, &size);
+
+	if( can_speak() ) {
+		printf(" - > Terminé.\n - > Étiquetage...\n");
+		fflush( stdout );
+	}
 
 	int approximated_labels[size];
 
@@ -174,6 +184,11 @@ double predict_and_compare_viterbi(Hmm * hmm, char * file_name) {
 		k = space + 1;
 		approximated_labels[space] = 0;
 		space = get_next_space(words, k, size);
+	}
+
+	if( can_speak() ) {
+		printf(" - > Terminé.\n");
+		fflush( stdout );
 	}
 
 	double accuracy = compare_labels_results(words, real_labels,

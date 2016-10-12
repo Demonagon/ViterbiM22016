@@ -1,6 +1,15 @@
 #include "log_sum.h"
 
-double log_occurence_probability(int n, int total) {
+double log_probability(double a) {
+	return - log(a);
+}
+
+double get_real_probability(double log)
+{
+	return exp( - log );
+}
+
+double log_occurence_probability(double n, double total) {
 	return log(total) - log(n);
 }
 
@@ -13,26 +22,24 @@ double log_probability_mult3(double a, double b, double c) {
 }
 
 void main_test_log_01() {
-	int total = 10000;
-	int a = 2;
-	int b = 20;
-	int c = 200;
-	int d = 2000;
-	int e = total - (a + b + c + d);
+	double a = 1/1000.0;
+	double b = 1/100.0;
 
-	printf("Probabilité brute :\n");
-	printf("p(a) = %lf\n", a / (double) total);
-	printf("p(b) = %lf\n", b / (double) total);
-	printf("p(c) = %lf\n", c / (double) total);
-	printf("p(d) = %lf\n", d / (double) total);
-	printf("p(e) = %lf\n", e / (double) total);
-	printf("p(all) = %lf\n", total / (double) total);
-	printf("Probabilité logarithmique :\n");
-	printf("p(a) = %lf\n", log_occurence_probability(a, total));
-	printf("p(b) = %lf\n", log_occurence_probability(b, total));
-	printf("p(c) = %lf\n", log_occurence_probability(c, total));
-	printf("p(d) = %lf\n", log_occurence_probability(d, total));
-	printf("p(e) = %lf\n", log_occurence_probability(e, total));
-	printf("p(total) = %lf\n", log_occurence_probability(total, total));
+	printf("a = %lf\n", a);
+	printf("b = %lf\n", b);
+	printf("a/b = %lf\n", a/b);
+	printf("-log(a) = %lf\n", log_probability(a) );
+	printf("-log(b) = %lf\n", log_probability(b) );
+
+	double aoverb = log_occurence_probability(a, b);
+
+	printf("-log(a/b) = %lf\n", aoverb);
+	printf("a/b = %lf\n", get_real_probability(aoverb) );
+
+	double atimesb = log_probability_mult(log_probability(a), log_probability(b));
+
+	printf("a * b = %lf\n", a * b);
+	printf("-log(a * b) = %lf\n", atimesb);
+	printf("a * b = %lf\n", get_real_probability(atimesb));
 }
 

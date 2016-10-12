@@ -14,7 +14,7 @@ BIN = hmm
 CC = clang
 
 INCLUDE = -I/usr/local/include -I/usr/include -lm
-FLAGS = -L/usr/local/lib -L/usr/lib -g -Wall -std=c99
+FLAGS = -L/usr/local/lib -L/usr/lib -Wall -std=c99
 
 #Pour chaque a.c dans CREP, on considère le module a
 RAW_LIB = $(shell echo $(CREP)/*.c)

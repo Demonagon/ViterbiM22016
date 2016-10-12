@@ -136,6 +136,39 @@ int * extract_labels(FILE * corpus, int * size) {
 	return labels;
 }
 
+int extract_labels_and_words(FILE * corpus, int ** words, int ** labels,
+							  int * size) {
+	static char line[LINE_LENGTH];
+	int sentences_count = 0;
+	char last_sentence_was_empty = 1;
+
+	* size = get_line_count(corpus);
+
+	rewind(corpus);
+
+	* words = malloc( sizeof(int) * *size );
+	* labels = malloc( sizeof(int) * *size );
+
+	int k = 0;
+
+	while( ! feof(corpus) ) {
+		get_line(corpus, line);
+
+		if( sscanf(line, "%d %d", (*words) + k, (*labels) + k) != 2 ) {
+			(*labels)[k] = 0;
+			(*words)[k] = 0;
+			if( ! last_sentence_was_empty ) sentences_count++;
+			last_sentence_was_empty = 1;
+		}
+		else
+			last_sentence_was_empty = 0;
+
+		k++;
+	}
+
+	return sentences_count;
+}
+
 void main_test_line_count() {
 	FILE * f = fopen("data/voc_etats.txt", "r");
 

@@ -12,6 +12,7 @@
 * séquence de phrases par l'intermédiaire de l'algorithme du perceptron.
 */
 
-void perceptron_compute_corpus(Hmm * hmm, char * corpus_file);
+void perceptron_compute_corpus(Hmm * hmm, char * corpus_file,
+							   double corpus_size);
 
 #endif

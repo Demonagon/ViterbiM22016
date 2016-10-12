@@ -15,6 +15,19 @@
 #include <stdio.h>
 #include <math.h>
 
+/**
+* Fournit - log(a).
+*/
+
+double log_probability(double a);
+
+/**
+* Fournit a, en supposant que log soit de la forme -log(a).
+* Se calcule par exp(-x), avec x le paramètre log.
+*/
+
+double get_real_probability(double log);
+
 /** 
 * Fournit -log(n/total). Ce calcul est effectué via
 * log(total) - log(n).
@@ -23,7 +36,7 @@
 * entier correspondant par exemple à des nombres
 * d'occurence.
 */
-double log_occurence_probability(int n, int total);
+double log_occurence_probability(double n, double total);
 
 /**
 * En supposant que a représente une probabilité

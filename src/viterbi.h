@@ -18,7 +18,17 @@
 * par le module hmm.
 */
 
-typedef void (*HmmGenerator)(Hmm *, char *);
+/**
+* Ici est représentée la définition d'un type de fonction génératrice de hmm.
+* Cette définition nous permet de remplacer un algorithme de perceptron par
+* un algorithme de calcul de probabilités par fréquences relatives simplement
+* sans avoir à reprogrammer tout l'algorithme de viterbi.
+* Le premier paramètre correspond au hmm à initialiser, le second au nom du
+* fichier contenant le corpus d'apprentissage, et enfin le dernier paramètre
+* donne le pourcentage du corpus d'apprentissage à considérer.
+*/
+
+typedef void (*HmmGenerator)(Hmm *, char *, double);
 
 /**
 * La fonction suivante calcule la précision obtenue par l'algorithme de viterbi
