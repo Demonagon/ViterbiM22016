@@ -1,0 +1,251 @@
+%% Based on a TeXnicCenter-Template by Tino Weinkauf.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% HEADER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,oneside,12pt]{article}
+%\setlength{\oddsidemargin}{5mm}
+%\setlength{\evensidemargin}{5mm}
+% Alternative Options:
+%	Paper Size: a4paper / a5paper / b5paper / letterpaper / legalpaper / executivepaper
+% Duplex: oneside / twoside
+% Base Font Size: 10pt / 11pt / 12pt
+
+
+%% Language %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[francais]{babel} %francais, polish, spanish, ...
+\usepackage[T1]{fontenc}
+\usepackage[ansinew]{inputenc}
+
+\usepackage{lmodern} %Type1-font for non-english texts and characters
+
+
+%% Packages for Graphics & Figures %%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} %%For loading graphic files
+%\usepackage{subfig} %%Subfigures inside a figure
+%\usepackage{pst-all} %%PSTricks - not useable with pdfLaTeX
+
+%% Please note:
+%% Images can be included using \includegraphics{Dateiname}
+%% resp. using the dialog in the Insert menu.
+%% 
+%% The mode "LaTeX => PDF" allows the following formats:
+%%   .jpg  .png  .pdf  .mps
+%% 
+%% The modes "LaTeX => DVI", "LaTeX => PS" und "LaTeX => PS => PDF"
+%% allow the following formats:
+%%   .eps  .ps  .bmp  .pict  .pntg
+
+
+%% Math Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}\usepackage{enumitem}
+\setlist[enumerate]{label*=\arabic*.}
+\newcommand\ddfrac[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+
+
+%% Line Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{setspace}
+%\singlespacing        %% 1-spacing (default)
+%\onehalfspacing       %% 1,5-spacing
+%\doublespacing        %% 2-spacing
+
+
+%% Other Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{a4wide} %%Smaller margins = more text per page.
+%\usepackage{fancyhdr} %%Fancy headings
+%\usepackage{longtable} %%For tables, that exceed one page
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Remarks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TODO:
+% 1. Edit the used packages and their options (see above).
+% 2. If you want, add a BibTeX-File to the project
+%    (e.g., 'literature.bib').
+% 3. Happy TeXing!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Options / Modifications
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\input{options} %You need a file 'options.tex' for this
+%% ==> TeXnicCenter supplies some possible option files
+%% ==> with its templates (File | New from Template...).
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\pagestyle{empty} %No headings for the first pages.
+
+
+%% Title Page %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ==> Write your text here or include other files.
+
+%% The simple version:
+\title{Modèle génératif et modèle discriminant pour l’étiquetage morpho-syntaxique : Rendu}
+\author{Pacôme Perrotin}
+\date{} %%If commented, the current date is used.
+\maketitle
+
+%% The nice version:
+%\input{titlepage} %%You need a file 'titlepage.tex' for this.
+%% ==> TeXnicCenter supplies a possible titlepage file
+%% ==> with its templates (File | New from Template...).
+
+
+%% Inhaltsverzeichnis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents %Table of contents
+\clearpage %The first chapter should start on an odd page.
+
+\pagestyle{plain} %Now display headings: headings / fancy / ...
+
+
+
+%% Chapters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ==> Write your text here or include other files.
+
+%\input{intro} %You need a file 'intro.tex' for this.
+
+\subsection{Introduction}\label{introduction}
+
+Ce projet a pour objectif de fournir un étiquetage morpho-syntaxique simple à partir d’un corpus complet. Ce travail est exécuté par le biais d'un Modèle Caché de Markov de forme bigramme, c'est à dire un algorithme présupposant l'affectation de catégories aux mots, en ne considérant que la successions des mots deux par deux. Ce HMM est implémenté de deux façon différentes, l’une par le biais d’un modèle génératif, l’autre grâce à un modèle discriminant.
+
+\paragraph{}
+Dans ce document nous présenterons l’implémentation de ce double problème sous de nombreux aspects. D’abord nous approcherons en plus de détails le modèle mathématique ici implémenté, puis nous aborderons l’implémentation elle-même. Une note sera adressée durant ces deux parties quant aux améliorations qui ont été ajoutées au modèle de base. Enfin les résultats obtenus en faisant varier les paramètres proposés seront détaillés et critiqués.
+
+\section{Modèle}\label{Modèle}
+
+\paragraph{}
+Dans ce projet nous nous intéressons à l'étiquettage d'une séquence de mots. Cet étiquettage peut être représenté de la façon suivante :
+
+Soit $S = \{ S_1, \cdots, S_N \}$ un ensemble de catégories et $O = O_1, \cdots, O_T$ une séquence de mots. L'étiquettage estimé de cette séquence est calculé par :
+\[\hat{Q} = arg\ \underset{Q \in S^T}{max}\ P(O,Q)\]
+Avec $P(O, Q)$ la probabilité d'observer la séquence $O$ étiquetée par $Q$.
+
+\paragraph{}
+	Le calcul en soit de cet étiquettage est pris en charge par l'algorithme de Viterbi. Cet algorithme présuppose l'existence des scores suivants :
+\begin{itemize}
+\item Pour chaque catégorie $S_i$, $\pi_i$ est le score de l'apparition de la catégorie $S_i$ au début d'une séquence observée.
+\item Pour chaque couple de catégorie $(S_i, S_j)$, $a_{ij}$ est le score de l'apparition successive de $S_i$ et $S_j$ n'importe où dans une séquence observée.
+\item Pour chaque mot $V_j$ et chaque catégorie $S_i$, $b_i(j)$ est le score de l'affectation du mot $V_j$ à la catégorie $S_i$ n'importe où dans une séquence observée.
+\end{itemize}
+\paragraph{}
+Derrière un score se cache un procédé qui donne un ordre d'importance numérique à un ensemble d'objet. Cet ordre d'importance peut-être opéré grâce à une distribution de probabilités, ou grâce à n'importe quelle autre méthode, par exemple un calcul de poids via un algorithme perceptron. Dans le reste de notre rapport, nous considérerons les scores comme devant être \textbf{minimisés} plutôt que maximisés afin d'obtenir un étiquetage optimal.
+
+\paragraph{}
+Notre approche du problème de l'étiquettage sera de d'abord calculer l'ensemble de ces scores suivant une certaine méthode grâce à un corpus d'apprentissage, puis d'appliquer l'algorithme de Viterbi pour calculer un ensemble d'étiquettes sur un corpus de test. Heureusement, avec l'énoncé de ce projet nous ont été fournis un corpus d'apprentissage et un corpus de test en bonnes formes et entièrement étiquetés, ce qui simplifie grandement le travail d'étiquettage automatique.
+
+\paragraph{}
+Reste à savoir comment extraire du corpus d'apprentissage les scores en question. Deux modèles différents de cette extraction seront abordés lors de ce projet : un modèle génératif basé sur un calcul de probabilités, et un modèle discriminant basé sur un algorithme de perceptron.
+
+\subsection{Modèle génératif}
+Ce modèle considère nos scores de la façon suivante :
+\begin{itemize}
+\item Scores initiaux : \[\pi_i = -\ log\ P(q_1 = S_i) \approx -\ log\ \ddfrac{C_\pi(S_i) + \alpha}{Nb_{sentences} + N \times \alpha }\]
+\item Scores de transition : \[a_{ij} = \sum_{t=2}^T -\ log\ P(q_t = S_j \mid q_{t-1} = S_i) \approx -\ log\ \ddfrac{C_a(S_i, S_j) + \alpha}{C(S_i) + N \times \alpha }\]
+\item Scores d'émission : \[b_i(j) = \sum_{t=1}^T -\ log\ P(O_t = V_j \mid q_t = S_i) \approx -\ log\ \ddfrac{C_b(S_i, V_j) + \alpha}{C(S_i) + K \times \alpha}\]
+\end{itemize}
+Avec, par ordre d'apparition :
+\begin{itemize}
+\item $C_\pi(S_i) =$ le nombre total de fois que $S_i$ a été observée au début d'une sous-séquence.
+\item $\alpha =$ le paramètre de lissage du modèle
+\item $Nb_{sentences} =$ le nombre total de sous séquences dans le corpus d'apprentissage.
+\item $N =$ le nombre d'étiquettes différentes.
+\item $T =$ la longueur du corpus.
+\item $C_a(S_i, S_j) =$ le nombre total de fois que le bigramme $(S_i, S_j)$ a été observé dans le corpus d'apprentissage.
+\item $C(S_i) =$ le nombre total de fois que l'étiquette $S_i$ a été observée dans le corpus d'apprentissage.
+\item $C_b(S_i, V_j) =$ le nombre total de fois que l'étiquette $S_i$ a coincidée avec l'observable $V_j$ dans le corpus d'apprentissage.
+\item $K =$ le nombre d'observables différents.
+\end{itemize}
+
+\paragraph{}
+Ce premier modèle est aussi le modèle le plus simple : étant donné un certain corpus d'apprentissage étiqueté, il se contente d'en extraire plusieurs statistiques, qu'il transforme ensuite en score grâce à une simple fraction. On notera l'utilisation systématique d'un logarithmique et d'une négation : ces modifications sont purement d'ordre pratique et permettent de repartitionner les probabilitées obtenues dans l'ensemble $[0, 1]$ sur l'ensemble $[0, + \infty[$ avec $0 \rightarrow +\infty$, ce qui donne une plus grande précision sur les données en programmation. La négation permet de ne pas travailler avec des nombres négatifs ; c'est son usage qui oblige le reste de notre programme à travailler sur la \textbf{minimisation} des scores obtenus plutôt que sur leur maximisation.
+
+\paragraph{}
+Le paramètre de lissage $\alpha$ fait partie des améliorations ajoutées au modèle initial proposé dans l'énoncé. Ce paramètre a pour mission de donner une probabilité minimale à l'ensemble des évènements ; ainsi, aucun évènement n'a de probabilité nulle (et donc de score $+\infty$). Ce paramètre aura généralement une valeur comprise dans $[0, 1]$. Cette garantie minimale de probabilité se fait en ajoutant $\alpha$ à la partie supérieure de chaque fraction, puis en ajoutant $N \times \alpha$ ou $K \times \alpha$ dans la partie inférieure de chaque fraction, afin que la somme des comptes soit toujours équivalente.
+
+\paragraph{}
+Ce modèle est très simple, car il n'exige qu'une seule lecture du corpus d'apprentissage, sur lequel il effectue un calcul de complexité linéaire.
+
+\subsection{Modèle discriminant}
+Ce second modèle, de type discriminant, emploie une solution plus complexe algorithmiquement ; plutôt que d'extraire directement les scores du corpus, on approxime leurs valeurs grâce à un algorithme de perceptron. Le vecteur de poids du perceptron considéré contiendra donc l'ensemble de nos scores $\pi_i$, $a_{ij}$ et $b_i(j)$.
+
+\paragraph{}
+Voici l'algorithme de perceptron utilisé par ce modèle, avec pour paramètre un nombre entier I dans $[1, + \infty[$ :
+\begin{enumerate}
+\item Initialiser les poids $\pi_i$, $a_{ij}$ et $b_i(j)$ à 0.
+\item Faire les opérations suivantes $I$ fois :
+	\begin{enumerate}
+		\item Pour chaque phrase $O = O_1 \cdots O_T$ d'étiquettes réelles $Q = q_1 \cdots q_T$, faire :
+		\begin{enumerate}
+			\item Calculer $\hat{Q} = \hat{q_1} \cdots \hat{q_T}$ grâce à l'algorithme de Viterbi sur $\pi_i$, $a_{ij}$ et $b_i(j)$
+			\item Si $Q \neq \hat{Q}$, faire :
+			\begin{enumerate}
+				\item $\pi_i = \pi_i
+						- \phi_{\pi_i}(Q)
+						+ \phi_{\pi_i}(\hat{Q})$
+				\item $a_{ij} = a_{ij}
+						- \sum_{t=2}^{T} \phi_{a_{ij}}(t, Q)
+						+ \sum_{t=2}^{T} \phi_{a_{ij}}(t, \hat{Q})$
+				\item $b_i(j) = b_i(j)
+						- \sum_{t=1}^{T} \phi_{b_i(j)}(t, Q)
+						+ \sum_{t=1}^{T} \phi_{b_i(j)}(t, \hat{Q})$
+			\end{enumerate}
+		\end{enumerate}
+	\end{enumerate}
+\item Renvoyer les poids $\pi_i$, $a_{ij}$ et $b_i(j)$.
+\end{enumerate}
+Avec, par ordre d'apparition :
+\begin{itemize}
+\item $\phi_{\pi_i}(Q) = 1\ si\ q_1 = S_i,\ 0\ sinon$
+\item $\phi_{a_{ij}}(t, Q) = 1\ si\ q_{t-1} = S_i\ et\ q_t = S_j,\ 0\ sinon$
+\item $\phi_{b_i(j)}(t, Q) = 1\ si\ q_t = S_i\ et\ O_t = V_j,\ 0\ sinon$
+\end{itemize}
+
+\paragraph{}
+Ce perceptron diminue à chaque itération les poids correspondant à l'étiquettage réelle, et augmente les poids correspondant à l'étiquettage approximé. Cela résulte en un calcul bien plus complexe que pour le modèle précédent, qui cependant affecte bien les scores minimaux aux évènements les plus probables.
+
+\section{Implémentation}\label{Implémentation}
+Notre implémentation a été réalisée en langage C, choisi pour son efficacité algorithmique. Le code qui a été produit dans le cadre de ce projet se divise en dix modules : data, evaluation, hmm, hmm init, log sum, main, parameters, parser, perceptron et viterbi. Chacun de ces modules possède un fichier en extension .h et un fichier en extension .c qui lui correspond dans le dossier src. Afin de détailler notre implémentation, nous allons présenter ces modules un à un, dans l'ordre de complexité.
+\subparagraph{}
+Il est à noter que chacun des fichier de ce projet dispose de commentaires qui présentent les différentes fonctions et expliquent le fonctionnement interne des fonctions les plus algorithmiques.
+
+\subsection{Module log sum}\label{log sum}
+
+\subsection{Module parameters}\label{parameters}
+
+\subsection{Module data}\label{data}
+
+\subsection{Module hmm}\label{hmm}
+
+\subsection{Module parser}\label{parser}
+
+\subsection{Module viterbi}\label{viterbi}
+
+\subsection{Module hmm init}\label{hmm init}
+
+\subsection{Module perceptron}\label{perceptron}
+
+\subsection{Module main}\label{main}
+
+\section{Résultats}\label{Résultats}
+
+\subsection{Résultats via le modèle génératif}\label{résultatsgénératifs}
+
+\subsection{Résultats via le modèle discriminant}\label{résultatsdiscriminant}
+
+\subsection{Conclusion}\label{Conclusion}
+
+\end{document}
+
