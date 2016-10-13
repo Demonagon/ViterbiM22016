@@ -74,6 +74,7 @@ void perceptron_compute_corpus(Hmm * hmm) {
 
 	for(int i = 0; i < I; i++) {
 
+		/* Affichage de la progression.*/
 		while( i / (double) I > progress_state / (double) progress_length
 			   && can_speak(data) ) {
 			progress_state++;
@@ -81,17 +82,24 @@ void perceptron_compute_corpus(Hmm * hmm) {
 			fflush( stdout );
 		}
 
+		/* Délimitation de la première phrase : elle commence en 0, et finit
+		au premier espace rencontré, space.*/
 		int k = 0;
 		int space = get_next_space(words, k, size);
 
+		/* Tant que la phrase considérée n'est pas vide */
 		while(k + 1 < size) {
+			/* On calcule les étiquettes sur cette phrase */
 			predict_viterbi(hmm, words + k, approximated_labels + k, space - k);
 
+			/* On corrige le perceptron sur cette phrase */
 			if( is_prediction_wrong_perceptron(
 				real_labels + k, approximated_labels + k, space - k) )
 				update_perceptron(hmm, words + k, real_labels + k,
 									  approximated_labels + k, space - k);
 
+			/* On passe à la phrase suivante, commencant en space + 1, et
+			finissant juste avant le prochain espace. */
 			k = space + 1;
 			approximated_labels[space] = 0;
 			space = get_next_space(words, k, size);
