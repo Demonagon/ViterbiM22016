@@ -359,11 +359,13 @@ Suite à l'implémentation de ce programme, nous avons collecté des résultats sur 
 
 \subsection{Résultats via le modèle génératif}\label{résultatsgénératif}
 
-Nos tests s'articulent autour de deux paramètres : le paramètre de lissage $\alpha$ et le paramètre de taille de corpus $c$. Pour chacune de ces variations, nous donnerons une table correspondant aux performances d'étiquettage, et une table de performance en temps.
+Nos tests s'articulent autour de deux paramètres : le paramètre de lissage $\alpha$ et le paramètre de taille de corpus $c$. Pour chacune de ces variations, nous donnerons une table correspondant aux performances d'étiquettage, et une table de performance en temps.\\
+\paragraph{}
+La première table que nous allons consulter représente les résultats en efficacité du projet en fonction de $\alpha$ et $c$ :\\
 
 \begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
 \hline
-Valeurs d'$\alpha$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+\% de précision & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
 $\alpha = 0.0$ & $60.7\%$ & $58.4\%$ & $56.0\%$ & $53.9\%$ & $51.6\%$ & $48.9\%$ & $45.5\%$ \\
 \hline
@@ -389,9 +391,24 @@ $\alpha = 1.0$ & $93.4\%$ & $93.2\%$ & $93.0\%$ & $92.7\%$ & $92.3\%$ & $92.0\%$
 \hline
 \end{tabular}
 
+\paragraph{}
+Par observation, on sépare ces résultats en deux parties, constituées par :
+\begin{itemize}
+\item La première ligne, bornée dans $[45.5\%, 60.7\%]$, qui représente les résultats sans lissage
+\item Le reste du tableau, borné dans $[91.4\%, 94.4\%]$, qui représente les résultats avec lissage
+\end{itemize}
+\paragraph{}
+Cette observation est une claire preuve que l'utilisation du lissage permet une grande précision de notre modèle génératif sur notre jeu de donnée.
+\paragraph{}
+La seconde observation que l'on peut faire se concentre sur la seconde partie précédemment distinguée. On observe en effet dans cette partie que les valeurs diminuent très régulièrement de gauche à droite ainsi que de haut en bas ; il y a une augmentation très lisse de notre pourcentage d'erreur en fonction de la fraction du corpus que l'on considère et de la valeur de lissage.
+\paragraph{}
+Les conséquences immédiates de tels résultats sont, d'un première part, que le modèle génératif sera de plus en plus préçis en fonction du montant d'informations d'apprentissage ; et d'autre part, que le paramètre de lissage doit être strictement positif pour donner de bons résultats, et que ces résultats seront visiblement d'autant plus préçis que ce paramètre sera faible. Quelques tests successifs ont permis de baliser l'optimum de ce paramètre à environ $\alpha = 0.008$.\\
+\paragraph{}
+Jetons maintenant un coup d'oeil sur la matrice contenant le temps de calcul des résultats obtenus dans la matrice précédente :\\
+
 \begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
 \hline
-Valeurs d'$\alpha$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+Temps & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
 $\alpha = 0.0$ & $2.88s$ & $2.87s$ & $2.88s$ & $2.87s$ & $2.86s$ & $2.85s$ & $2.85s$ \\
 \hline
@@ -417,11 +434,25 @@ $\alpha = 1.0$ & $2.99s$ & $2.98s$ & $2.98s$ & $2.97s$ & $2.98s$ & $2.98s$ & $2.
 \hline
 \end{tabular}
 
+\paragraph{}
+Devant analyse, ces résultats en temps du modèle génératif sont très constant. Le programme semble toujours s'exécuter autour des 3 secondes. Le paramètre $\alpha$ semble avoir une incidence ; lorsqu'il est égal à 0 ou 1, le temps global diminue de quelques centièmes de secondes. Cela s'explique vraisemblablement par l'optimisation de calcul du C lorsqu'il n'a pas à utiliser de nombres flottants.
+\paragraph{}
+Le paramètre $c$, quant à lui, semble avoir une très légère influence sur le temps d'exécution. Ignorer 60\% du corpus nous sauve dans les deux centième de seconde. C'est un résultat attendu, puisque le modèle génératif est linéaire en la taille du corpus d'apprentissage.
+\\
+\paragraph{}
+Devant ces résultats, il est correct de dire que le modèle génératif est un très bon modèle conçernant notre corpus. 6\% d'erreur est certes un très bon résultat, mais ce qui fait encore plus la force de ce modèle c'est sa grande rapidité de calcul ; cela est idéal lorsque l'on veut estimer la valeur optimal d'un paramètre, par exemple.
+
 \subsection{Résultats via le modèle discriminant}\label{résultatsdiscriminant}
+
+\paragraph{}
+Dans le cadre du modèle discriminant, nous avons effectué des tests de nature très similaire. Simplement, au lieu de faire varier le paramètre $\alpha$ ici inutile, nous avons fait varier le paramètre $I$ qui représente le nombre d'itération de l'algorithme perceptron nécessaire au modèle disciminant. Il va avoir, comme nous le verrons, un grand impact autant sur le temps de calcul que la précision des résultats.\\
+
+\paragraph{}
+Jetons pour commencer un regard sur ce tableau répertoriant les pourcentages de précision obtenus par notre modèle discriminant :\\
 
 \begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
 \hline
-Valeurs de $I$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+\% de précision & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
 $I = 10$ & $94.3\%$ & $93.7\%$ & $94.0\%$ & $93.1\%$ & $92.0\%$ & $92.3\%$ & $91.5\%$ \\
 \hline
@@ -445,9 +476,18 @@ $I =  1$ & $91.4\%$ & $92.0\%$ & $89.7\%$ & $91.9\%$ & $90.6\%$ & $86.2\%$ & $88
 \hline
 \end{tabular}
 
+\paragraph{}
+De ces données se dégagent plusieurs tendances. Pour commencer, on notera que la diminution indépendante ou simultanée des paramètres $c$ et $I$ a un effet globalement négatif sur la précision de notre modèle. La seconde observation est que les résultats deviennent de plus en plus instable lorsque $I$ s'approche de 0 : on note à la dernière ligne par exemple des fluctuations très aléatoires, le score montant de 91\% à 92\%, puis descendant jusqu'à 89\%, alternant ainsi jusqu'à obtenir le minimum en terme de score de 88.8\% en dernière case.
+
+\paragraph{}
+Ces données pointent vers le fait assez simple que notre modèle obtiendra de meilleurs résultats s'il dispose de plus de données. Il obtiendra également une meilleure précision lorsque l'on augmente le nombre d'itérations. En effet, avec peu d'itérations, les erreurs que fait le perceptron n'ont pas le temps de se corriger, d'où l'instabilité globale des résultats de notre second modèle.\\
+
+\paragraph{}
+Enfin, terminons l'analyse des données avec ce dernier tableau, assignant à chaque pourcentage de réussite précédent le nombre de secondes qui a été nécessaire à son calcul :\\
+
 \begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
 \hline
-Valeurs de $I$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+Temps & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
 $I = 10$ & $146s$ & $131s$ & $117s$ & $103s$ & $88.4s$ & $74.4s$ & $59.7s$ \\
 \hline
@@ -471,7 +511,20 @@ $I =  1$ & $17.1s$ & $15.6s$ & $14.1s$ & $12.8s$ & $11.3s$ & $9.84s$ & $8.43s$ \
 \hline
 \end{tabular}
 
+\paragraph{}
+Ici, on observe une très claire corrélation entre le temps pris par l'algorithme et le nombre de ses itérations, ce qui semble tout à fait normal. On observe un effet similaire avec le paramètre $c$ : pour 146s à $c = 1$, le temps tombe à 74.4s à $c = 0.5$, ce qui est quasiment la moitié. Les données tendent à mettre en avant une tendance linéaire entre le temps de calcul et $c$.\\
+
+\paragraph{}
+Ces quatre tableau offre dans leur ensemble une idée assez claire de la situation ; et il est juste de pouvoir dire que le modèle génératif est ici un meilleur modèle que le modèle discriminant. Les deux modèles semblent offrir dans les données un optimum similaire, autour des 5.7\% d'erreur. Cependant la comparaison en temps est, elle, ne porte à aucune hésitation, le modèle génératif restant remarquablement constant dans son temps d'exécution, là où le modèle discriminant prend très rapidement de longues minutes pour offrir un résultat similaire.
+
 \subsection{Conclusion}\label{Conclusion}
+Le problème de l'étiquettage est, dans la pratique, un problème complexe à aborder efficacement. En effet, et comme la plupart des problèmes qu'aborde les sciences du traitement automatique de la langue, c'est un problème qui repose sur des grandes masses de données ; et cela pose plusieurs contraintes. La première, c'est qu'il n'arrive jamais en pratique que cette donnée soit d'une forme pratique et utilisable directement. La seconde, c'est que la moindre complexité algorithmique prend des dimensions astromnomiques très rapidement.
+\paragraph{}
+Ici, nous avons été chanceux ; le corpus à notre disposition était en effet entièrement étiqueté. Cette disposition des choses nous a permis de mettre en place un modèle génératif, qui possède la très grande qualité de fonctionner très vite. Ici le modèle discriminant se trouve inopérant en comparaison, car bien trop lent sur des instances de plus en plus grandes.
+\paragraph{}
+On serait tenté de qualifier un algorithme comme le perceptron inefficace quant au problème d'étiquettage ; cependant, les choses sont un peu plus complexes. En effet, les corpus entièrement étiquetés sont dans la pratique extrêmement rares et les informaticiens doivent constamment jouer avec données dont ils ne savent pas tout. Bien souvent les modèles génératifs sont trop simplistes pour fonctionner, car trop exigeants sur la forme du corpus. \\
+\paragraph{}
+Dans un exemple comme celui de ce projet, un modèle génératif comme nous l'avons implémenté est sans aucun doute le meilleur compromis de temps et de résultat. Essayer quelque chose d'autre, comme un perceptron, ce serait faire la même chose en moins bien ; les données dont nous disposons sont suffisament riches pour faire des prédictions précises après un simple comptage. Cependant dans la pratique les données sont toujours plus difficile à exploiter. Les modèles génératifs sont ainsi inopérants. L'informaticien, s'il veut pouvoir effectuer des prédictions et des calculs sur le langage, doit savoir s'armer dans la pratique d'outils plus complexes.
 
 \end{document}
 
