@@ -119,7 +119,7 @@
 
 \subsection{Introduction}\label{introduction}
 
-Ce projet a pour objectif de fournir un étiquetage morpho-syntaxique simple à partir d’un corpus complet. Ce travail est exécuté par le biais d'un Modèle Caché de Markov de forme bigramme, c'est à dire un algorithme présupposant l'affectation de catégories aux mots, en ne considérant que la successions des mots deux par deux. Ce HMM est implémenté de deux façon différentes, l’une par le biais d’un modèle génératif, l’autre grâce à un modèle discriminant.
+Ce projet a pour objectif de fournir un étiquetage morpho-syntaxique simple à partir d’un corpus complet. Ce travail est exécuté par le biais d'un modèle caché de Markov basé sur des bigrammes, c'est à dire un algorithme présupposant que les mots possèdent des états et que ces états se composent deux par deux par un certaine loi probabiliste. Ce HMM est implémenté de deux façon différentes, l’une grâce à un modèle génératif, l’autre grâce à un modèle discriminant.
 
 \paragraph{}
 Dans ce document nous présenterons l’implémentation de ce double problème sous de nombreux aspects. D’abord nous approcherons en plus de détails le modèle mathématique ici implémenté, puis nous aborderons l’implémentation elle-même. Une note sera adressée durant ces deux parties quant aux améliorations qui ont été ajoutées au modèle de base. Enfin les résultats obtenus en faisant varier les paramètres proposés seront détaillés et critiqués.
@@ -127,24 +127,24 @@ Dans ce document nous présenterons l’implémentation de ce double problème sous d
 \section{Modèle}\label{Modèle}
 
 \paragraph{}
-Dans ce projet nous nous intéressons à l'étiquettage d'une séquence de mots. Cet étiquettage peut être représenté de la façon suivante :
+Dans ce projet nous nous intéressons à l'étiquetage d'une séquence de mots. Cet étiquetage peut être représenté de la façon suivante :
 
-Soit $S = \{ S_1, \cdots, S_N \}$ un ensemble de catégories et $O = O_1, \cdots, O_T$ une séquence de mots. L'étiquettage estimé de cette séquence est calculé par :
+Soit $S = \{ S_1, \cdots, S_N \}$ un ensemble de catégories et $O = O_1, \cdots, O_T$ une séquence de mots. L'étiquetage estimé de cette séquence est calculé par :
 \[\hat{Q} = arg\ \underset{Q \in S^T}{max}\ P(O,Q)\]
 Avec $P(O, Q)$ la probabilité d'observer la séquence $O$ étiquetée par $Q$.
 
 \paragraph{}
-	Le calcul en soit de cet étiquettage est pris en charge par l'algorithme de Viterbi. Cet algorithme présuppose l'existence des scores suivants :
+	Le calcul en soi de cet étiquetage est pris en charge par l'algorithme de Viterbi. Cet algorithme présuppose l'existence des scores suivants :
 \begin{itemize}
 \item Pour chaque catégorie $S_i$, $\pi_i$ est le score de l'apparition de la catégorie $S_i$ au début d'une séquence observée.
-\item Pour chaque couple de catégorie $(S_i, S_j)$, $a_{ij}$ est le score de l'apparition successive de $S_i$ et $S_j$ n'importe où dans une séquence observée.
+\item Pour chaque paire de catégorie $(S_i, S_j)$, $a_{ij}$ est le score de l'apparition successive de $S_i$, $S_j$ n'importe où dans une séquence observée.
 \item Pour chaque mot $V_j$ et chaque catégorie $S_i$, $b_i(j)$ est le score de l'affectation du mot $V_j$ à la catégorie $S_i$ n'importe où dans une séquence observée.
 \end{itemize}
 \paragraph{}
-Derrière un score se cache un procédé qui donne un ordre d'importance numérique à un ensemble d'objet. Cet ordre d'importance peut-être opéré grâce à une distribution de probabilités, ou grâce à n'importe quelle autre méthode, par exemple un calcul de poids via un algorithme perceptron. Dans le reste de notre rapport, nous considérerons les scores comme devant être \textbf{minimisés} plutôt que maximisés afin d'obtenir un étiquetage optimal.
+Derrière un score se cache un procédé qui donne un ordre d'importance numérique à un ensemble d'objets. Cet ordre d'importance peut-être représenté grâce à une distribution de probabilités, ou grâce à n'importe quelle autre méthode, par exemple un calcul de poids via un algorithme perceptron. Dans le reste de notre rapport, nous considérerons les scores comme devant être \textbf{minimisés} plutôt que maximisés afin d'obtenir un étiquetage optimal.
 
 \paragraph{}
-Notre approche du problème de l'étiquettage sera de d'abord calculer l'ensemble de ces scores suivant une certaine méthode grâce à un corpus d'apprentissage, puis d'appliquer l'algorithme de Viterbi pour calculer un ensemble d'étiquettes sur un corpus de test. Heureusement, avec l'énoncé de ce projet nous ont été fournis un corpus d'apprentissage et un corpus de test en bonnes formes et entièrement étiquetés, ce qui simplifie grandement le travail d'étiquettage automatique.
+Notre approche du problème de l'étiquetage sera de calculer d'abord l'ensemble de ces scores suivant une certaine méthode grâce à un corpus d'apprentissage, puis d'appliquer l'algorithme de Viterbi sur un corpus de test pour en calculer un ensemble d'étiquettes. La comparaison de ces étiquettes calculées, $\hat{Q}$, avec les étiquettes réelles de la séquence, $Q$, nous permet d'obtenir un score de précision. Heureusement, avec l'énoncé de ce projet nous ont été fournis un corpus d'apprentissage et un corpus de test entièrement étiquetés, ce qui simplifie grandement le travail d'étiquetage automatique.
 
 \subsection{L'algorithme de Viterbi}\label{modèleviterbi}
 L'algorithme de Viterbi est un algorithme classique de programmation dynamique de calcul sur les treillis, ici utilisé pour calculer la meilleure séquence d'étiquette sans avoir à considérer un nombre exponentiel d'éléments. Le voici sous une version proche de celle implémentée dans le projet :
@@ -167,7 +167,7 @@ L'algorithme de Viterbi est un algorithme classique de programmation dynamique d
 \end{enumerate}
 
 \paragraph{}
-Reste à savoir comment extraire du corpus d'apprentissage les scores utilisés dans l'algorithme. Deux modèles différents de cette extraction seront abordés lors de ce projet : un modèle génératif basé sur un calcul de probabilités, et un modèle discriminant basé sur un algorithme de perceptron.
+Reste à savoir comment extraire du corpus d'apprentissage les scores utilisés dans l'algorithme. Deux modèles différents de cette extraction seront abordés lors de ce projet : un modèle génératif basé sur un calcul de probabilité, et un modèle discriminant basé sur un algorithme de perceptron.
 
 \subsection{Modèle génératif}\label{modèlegénératif}
 Ce modèle considère nos scores de la façon suivante :
@@ -180,7 +180,7 @@ Avec, par ordre d'apparition :
 \begin{itemize}
 \item $C_\pi(S_i) =$ le nombre total de fois que $S_i$ a été observée au début d'une sous-séquence.
 \item $\alpha =$ le paramètre de lissage du modèle
-\item $Nb_{sentences} =$ le nombre total de sous séquences dans le corpus d'apprentissage.
+\item $Nb_{sentences} =$ le nombre total de sous-séquences dans le corpus d'apprentissage.
 \item $N =$ le nombre d'étiquettes différentes.
 \item $T =$ la longueur du corpus.
 \item $C_a(S_i, S_j) =$ le nombre total de fois que le bigramme $(S_i, S_j)$ a été observé dans le corpus d'apprentissage.
@@ -193,21 +193,21 @@ Avec, par ordre d'apparition :
 Ce premier modèle est aussi le modèle le plus simple : étant donné un certain corpus d'apprentissage étiqueté, il se contente d'en extraire plusieurs statistiques, qu'il transforme ensuite en score grâce à une simple fraction. On notera l'utilisation systématique d'un logarithmique et d'une négation : ces modifications sont purement d'ordre pratique et permettent de repartitionner les probabilitées obtenues dans l'ensemble $[0, 1]$ sur l'ensemble $[0, + \infty[$ avec $0 \rightarrow +\infty$, ce qui donne une plus grande précision sur les données en programmation. La négation permet de ne pas travailler avec des nombres négatifs ; c'est son usage qui oblige le reste de notre programme à travailler sur la \textbf{minimisation} des scores obtenus plutôt que sur leur maximisation.
 
 \paragraph{}
-Le paramètre de lissage $\alpha$ fait partie des améliorations ajoutées au modèle initial proposé dans l'énoncé. Ce paramètre a pour mission de donner une probabilité minimale à l'ensemble des évènements ; ainsi, aucun évènement n'a de probabilité nulle (et donc de score $+\infty$). Ce paramètre aura généralement une valeur comprise dans $[0, 1]$. Cette garantie minimale de probabilité se fait en ajoutant $\alpha$ à la partie supérieure de chaque fraction, puis en ajoutant $N \times \alpha$ ou $K \times \alpha$ dans la partie inférieure de chaque fraction, afin que la somme des comptes soit toujours équivalente.
+Le paramètre de lissage $\alpha$ fait partie des améliorations ajoutées au modèle initial proposé dans l'énoncé. Ce paramètre a pour mission de donner une probabilité minimale à l'ensemble des évènements ; ainsi, aucun évènement n'a de probabilité nulle (et donc de score $+\infty$). Ce paramètre aura généralement une valeur comprise dans $[0, 1]$. Cette garantie minimale de probabilité se fait en ajoutant $\alpha$ à la partie supérieure de chaque fraction, puis en ajoutant $N \times \alpha$ ou $K \times \alpha$ dans la partie inférieure de chaque fraction, afin que la valeur de la somme soit toujours équivalente à la somme des valeurs individuelles.
 
 \paragraph{}
 Ce modèle est très simple, car il n'exige qu'une seule lecture du corpus d'apprentissage, sur lequel il effectue un calcul de complexité linéaire.
 
 \subsection{Modèle discriminant}\label{modèlediscriminant}
-Ce second modèle, de type discriminant, emploie une solution plus complexe algorithmiquement ; plutôt que d'extraire directement les scores du corpus, on approxime leurs valeurs grâce à un algorithme de perceptron. Le vecteur de poids du perceptron considéré contiendra donc l'ensemble de nos scores $\pi_i$, $a_{ij}$ et $b_i(j)$.
+Ce second modèle, de type discriminant, emploie une solution plus complexe algorithmiquement ; plutôt que d'extraire directement les scores du corpus, on approxime leurs valeurs grâce à un algorithme de perceptron. Le vecteur de poids du perceptron considéré contiendra l'ensemble de nos scores $\pi_i$, $a_{ij}$ et $b_i(j)$.
 
 \paragraph{}
-Voici l'algorithme de perceptron utilisé par ce modèle, avec pour paramètre un nombre entier I dans $[1, + \infty[$ :
+Voici l'algorithme de perceptron utilisé par ce modèle, avec pour paramètre un nombre entier $I$ dans $[1, + \infty[$ :
 \begin{enumerate}
 \item Initialiser les poids $\pi_i$, $a_{ij}$ et $b_i(j)$ à 0.
 \item Faire les opérations suivantes $I$ fois :
 	\begin{enumerate}
-		\item Pour chaque phrase $O = O_1 \cdots O_T$ d'étiquettes réelles $Q = q_1 \cdots q_T$, faire :
+		\item Pour chaque phrase $O = O_1 \cdots O_T$ de séquence réelle d'étiquettes $Q = q_1 \cdots q_T$, faire :
 		\begin{enumerate}
 			\item Calculer $\hat{Q} = \hat{q_1} \cdots \hat{q_T}$ grâce à l'algorithme de Viterbi sur $\pi_i$, $a_{ij}$ et $b_i(j)$
 			\item Si $Q \neq \hat{Q}$, faire :
@@ -234,7 +234,7 @@ Avec, par ordre d'apparition :
 \end{itemize}
 
 \paragraph{}
-Ce perceptron diminue à chaque itération les poids correspondant à l'étiquettage réelle, et augmente les poids correspondant à l'étiquettage approximé. Cela résulte en un calcul bien plus complexe que pour le modèle précédent, qui cependant affecte bien les scores minimaux aux évènements les plus probables.
+Ce perceptron , à chaque itération, diminue les poids correspondant à l'étiquetage réel et augmente les poids correspondant à l'étiquetage approximé. Cela résulte en un calcul bien plus complexe que pour le modèle précédent, qui affecte cependant bien les scores minimaux aux évènements les plus probables.
 
 \section{Implémentation}\label{Implémentation}
 Notre implémentation a été réalisée en langage C, choisi pour son efficacité algorithmique. Le code qui a été produit dans le cadre de ce projet se divise en dix modules : data, evaluation, hmm, hmm init, log sum, main, parameters, parser, perceptron et viterbi. Chacun de ces modules possède un fichier en extension .h et un fichier en extension .c qui lui correspondent dans le dossier src. Afin de détailler notre implémentation, nous allons présenter ces modules un à un, dans l'ordre de complexité.
@@ -247,11 +247,11 @@ Le module log sum est sans doute le module le plus simple de l'ensemble du proje
 
 \subsection{Module parameters}\label{parameters}
 
-Le travail de ce module est de prendre en charge les paramètres données en ligne de commande par l'utilisateur, et de stocker les informations intéressantes sous la forme d'une structure donnée. Les paramètres retenus dans la structure sont les suivants :
+Le travail de ce module est de prendre en charge les paramètres données en ligne de commande par l'utilisateur, et de stocker les informations intéressantes sous la forme d'une structure de donnée. Les paramètres retenus dans la structure sont les suivants :
 \begin{itemize}
 \item Le bruit de l'exécution : silencieux, normal, bruyant. Définit le montant d'affichage console généré par le programme.
-\item Le type d'exécution : seulement le modèle discriminant, seulement le modèle génératif ou les deux en même temps. Nous permettons de tester les deux modèles consécutivement pour une seule lecture du corpus, ce qui permet de gagner beaucoup de temps lors de tests.
-\item c : chiffre flottant dans $[0, 1]$, qui correspond au ratio du nombre de phrases du corpus d'apprentissage qui sera effectivement lu et enregistré. (Voir \ref{hmm init} et \ref{perceptron} pour l'utilisation de ce paramètre en pratique)
+\item Le type d'exécution : seulement le modèle discriminant, seulement le modèle génératif ou les deux en même temps. Nous permettons de tester les deux modèles consécutivement pour une seule lecture du corpus, ce qui permet de gagner un peu de temps lors de tests.
+\item c : chiffre flottant dans $[0, 1]$, qui correspond au ratio du nombre de phrases du corpus d'apprentissage qui sera effectivement lu et enregistré. (Voir \ref{data} pour l'utilisation de ce paramètre en pratique)
 \item I : la constante qui indique le nombre d'itérations de l'algorithme perceptron.
 \item $\alpha$ : la constante de lissage utilisée dans le modèle génératif. (Voir \ref{modèlegénératif}, \ref{hmm init})
 \end{itemize}
@@ -293,6 +293,9 @@ Ce module rend accessible un ensemble d'informations cruciales à l'ensemble des 
 
 \paragraph{}
 Ce module est également le module qui prend en charge la lecture des corpus d'apprentissage et de test à partir des chemins donnés en paramètres du programme. Ce design permet une lecture minimale des fichiers, ici réduite à deux parcours par fichiers. Les fonctions du module parser (\ref{parser}) sont ici employées.
+
+\paragraph{}
+C'est dans ce module que vient en compte une autre amélioration qui a été apportée à l'énoncé de base ; la capacité de choisir de ne lire qu'une fraction du corpus de base. Ce choix se fait grâce au paramètre $c$ : celui çi définit quelle fraction du corpus va être lue. Si $c = 0.5$, uniquement la moitié des phrases du corpus d'apprentissage seront lues. La lecture ne s'arrête jamais au milieu d'un phrase ; lorsque $c \times N$ mots ont été lus (avec $N$ le nombre total de mots du corpus), l'algorithme de lecture s'arrête dès qu'il a finit sa phrase courante. À l'issue de la lecture, toutes les phrases lues sont inscrites dans la structure de donnée.
 
 \subsection{Module hmm}\label{hmm}
 
@@ -355,11 +358,13 @@ Enfin, le module main contient la fonction principale du programme. Cette foncti
 
 \section{Résultats}\label{Résultats}
 
-Suite à l'implémentation de ce programme, nous avons collecté des résultats sur les différends modèles et en faisant varier nos paramètres. La section qui va suivre va détailler ces résultats et fournir une conclusion simple sur chacun d'entre eux. Nous conclurons enfin ce rapport en prenant un peu de recul sur l'ensemble de ces résultats, et de leur signification dans le cadre du travail demandé.
+Suite à l'implémentation de ce programme, nous avons collecté des résultats sur les différends modèles en faisant varier nos paramètres. La section qui va suivre va détailler ces résultats et fournir une conclusion sur chacun d'entre eux. Nous conclurons ensuite ce rapport en prenant un peu de recul sur l'ensemble de ces résultats, et de leur signification dans le cadre du travail demandé.
 
 \subsection{Résultats via le modèle génératif}\label{résultatsgénératif}
 
-Nos tests s'articulent autour de deux paramètres : le paramètre de lissage $\alpha$ et le paramètre de taille de corpus $c$. Pour chacune de ces variations, nous donnerons une table correspondant aux performances d'étiquettage, et une table de performance en temps.\\
+Nos tests s'articulent autour de deux paramètres : le paramètre de lissage $\alpha$ et le paramètre de taille de corpus $c$. Pour chacune de ces variations, nous donnerons une table correspondant aux performances d'étiquetage, et une table de performance en temps.
+\subparagraph{}
+Note : l'ensemble des valeurs de précisions sont en pourcentage. Il s'agit du montant d'étiquettes qui ont été bien estimées par l'algorithme.
 \paragraph{}
 La première table que nous allons consulter représente les résultats en efficacité du projet en fonction de $\alpha$ et $c$ :\\
 
@@ -394,17 +399,17 @@ $\alpha = 1.0$ & $93.4\%$ & $93.2\%$ & $93.0\%$ & $92.7\%$ & $92.3\%$ & $92.0\%$
 \paragraph{}
 Par observation, on sépare ces résultats en deux parties, constituées par :
 \begin{itemize}
-\item La première ligne, bornée dans $[45.5\%, 60.7\%]$, qui représente les résultats sans lissage
-\item Le reste du tableau, borné dans $[91.4\%, 94.4\%]$, qui représente les résultats avec lissage
+\item La première ligne, bornée dans $[45.5\%, 60.7\%]$, qui regroupe les résultats sans lissage
+\item Le reste du tableau, borné dans $[91.4\%, 94.4\%]$, qui regroupe les résultats avec lissage
 \end{itemize}
 \paragraph{}
-Cette observation est une claire preuve que l'utilisation du lissage permet une grande précision de notre modèle génératif sur notre jeu de donnée.
+Cette observation est une claire preuve que l'utilisation du lissage permet une bien meilleure précision de notre modèle génératif, étant donné notre jeu de données.
 \paragraph{}
 La seconde observation que l'on peut faire se concentre sur la seconde partie précédemment distinguée. On observe en effet dans cette partie que les valeurs diminuent très régulièrement de gauche à droite ainsi que de haut en bas ; il y a une augmentation très lisse de notre pourcentage d'erreur en fonction de la fraction du corpus que l'on considère et de la valeur de lissage.
 \paragraph{}
 Les conséquences immédiates de tels résultats sont, d'un première part, que le modèle génératif sera de plus en plus préçis en fonction du montant d'informations d'apprentissage ; et d'autre part, que le paramètre de lissage doit être strictement positif pour donner de bons résultats, et que ces résultats seront visiblement d'autant plus préçis que ce paramètre sera faible. Quelques tests successifs ont permis de baliser l'optimum de ce paramètre à environ $\alpha = 0.008$.\\
 \paragraph{}
-Jetons maintenant un coup d'oeil sur la matrice contenant le temps de calcul des résultats obtenus dans la matrice précédente :\\
+Jetons maintenant un coup d'oeil sur cette matrice contenant les temps de calcul correspondant aux résultats obtenus dans la matrice précédente :\\
 
 \begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
 \hline
@@ -435,17 +440,17 @@ $\alpha = 1.0$ & $2.99s$ & $2.98s$ & $2.98s$ & $2.97s$ & $2.98s$ & $2.98s$ & $2.
 \end{tabular}
 
 \paragraph{}
-Devant analyse, ces résultats en temps du modèle génératif sont très constant. Le programme semble toujours s'exécuter autour des 3 secondes. Le paramètre $\alpha$ semble avoir une incidence ; lorsqu'il est égal à 0 ou 1, le temps global diminue de quelques centièmes de secondes. Cela s'explique vraisemblablement par l'optimisation de calcul du C lorsqu'il n'a pas à utiliser de nombres flottants.
+Devant analyse, ces résultats en temps du modèle génératif apparaissent très constant. Le programme prend toujours entre $2.85$ et $3.05$ secondes pour effectuer son étiquetage. Le paramètre $\alpha$ semble avoir une incidence ; lorsqu'il est égal à 0 ou 1, le temps global diminue de quelques centièmes de secondes. Cela s'explique vraisemblablement par l'optimisation de calcul du C lorsqu'il n'a pas à utiliser de nombre flottant.
 \paragraph{}
 Le paramètre $c$, quant à lui, semble avoir une très légère influence sur le temps d'exécution. Ignorer 60\% du corpus nous sauve dans les deux centième de seconde. C'est un résultat attendu, puisque le modèle génératif est linéaire en la taille du corpus d'apprentissage.
 \\
 \paragraph{}
-Devant ces résultats, il est correct de dire que le modèle génératif est un très bon modèle conçernant notre corpus. 6\% d'erreur est certes un très bon résultat, mais ce qui fait encore plus la force de ce modèle c'est sa grande rapidité de calcul ; cela est idéal lorsque l'on veut estimer la valeur optimal d'un paramètre, par exemple.
+Devant ces résultats, il est correct de dire que le modèle génératif est un très bon modèle conçernant notre corpus. Le faible taux d'erreur s'accompagne d'une très bonne garantie en temps ; cela est idéal lorsque l'on veut estimer la valeur optimale d'un paramètre, ou effectuer un étiquetage sur un très grand corpus.
 
 \subsection{Résultats via le modèle discriminant}\label{résultatsdiscriminant}
 
 \paragraph{}
-Dans le cadre du modèle discriminant, nous avons effectué des tests de nature très similaire. Simplement, au lieu de faire varier le paramètre $\alpha$ ici inutile, nous avons fait varier le paramètre $I$ qui représente le nombre d'itération de l'algorithme perceptron nécessaire au modèle disciminant. Il va avoir, comme nous le verrons, un grand impact autant sur le temps de calcul que la précision des résultats.\\
+Dans le cadre du modèle discriminant, nous avons effectué des tests de nature très similaire. Au lieu de faire varier le paramètre $\alpha$, nous avons fait varier le paramètre $I$ qui représente le nombre d'itération de l'algorithme perceptron utilisé dans le modèle discriminant. Ce paramètre va avoir, comme nous le verrons, un grand impact autant sur le temps de calcul que la précision des résultats.\\
 
 \paragraph{}
 Jetons pour commencer un regard sur ce tableau répertoriant les pourcentages de précision obtenus par notre modèle discriminant :\\
@@ -477,10 +482,10 @@ $I =  1$ & $91.4\%$ & $92.0\%$ & $89.7\%$ & $91.9\%$ & $90.6\%$ & $86.2\%$ & $88
 \end{tabular}
 
 \paragraph{}
-De ces données se dégagent plusieurs tendances. Pour commencer, on notera que la diminution indépendante ou simultanée des paramètres $c$ et $I$ a un effet globalement négatif sur la précision de notre modèle. La seconde observation est que les résultats deviennent de plus en plus instable lorsque $I$ s'approche de 0 : on note à la dernière ligne par exemple des fluctuations très aléatoires, le score montant de 91\% à 92\%, puis descendant jusqu'à 89\%, alternant ainsi jusqu'à obtenir le minimum en terme de score de 88.8\% en dernière case.
+De ces données se dégagent plusieurs tendances. Pour commencer, on notera que la diminution indépendante ou simultanée des paramètres $c$ et $I$ a un effet globalement négatif sur la précision de notre modèle. La seconde observation est que les résultats deviennent de plus en plus instable lorsque $I$ s'approche de 0 : on note à la dernière ligne par exemple des fluctuations très aléatoires, le score montant de 91\% à 92\%, puis descendant jusqu'à 89\%, alternant ainsi jusqu'à obtenir le minimum en terme de score de 88.8\% à la dernière case.
 
 \paragraph{}
-Ces données pointent vers le fait assez simple que notre modèle obtiendra de meilleurs résultats s'il dispose de plus de données. Il obtiendra également une meilleure précision lorsque l'on augmente le nombre d'itérations. En effet, avec peu d'itérations, les erreurs que fait le perceptron n'ont pas le temps de se corriger, d'où l'instabilité globale des résultats de notre second modèle.\\
+Ces données pointent vers le fait assez simple que notre modèle obtiendra de meilleurs résultats s'il dispose de plus de données. Il obtiendra également une meilleure précision lorsque l'on augmente le nombre d'itérations. En effet, avec peu d'itérations, les erreurs que fait le perceptron n'ont pas le temps de se corriger, d'où l'instabilité globale des résultats de ce modèle.\\
 
 \paragraph{}
 Enfin, terminons l'analyse des données avec ce dernier tableau, assignant à chaque pourcentage de réussite précédent le nombre de secondes qui a été nécessaire à son calcul :\\
@@ -515,14 +520,14 @@ $I =  1$ & $17.1s$ & $15.6s$ & $14.1s$ & $12.8s$ & $11.3s$ & $9.84s$ & $8.43s$ \
 Ici, on observe une très claire corrélation entre le temps pris par l'algorithme et le nombre de ses itérations, ce qui semble tout à fait normal. On observe un effet similaire avec le paramètre $c$ : pour 146s à $c = 1$, le temps tombe à 74.4s à $c = 0.5$, ce qui est quasiment la moitié. Les données tendent à mettre en avant une tendance linéaire entre le temps de calcul et $c$.\\
 
 \paragraph{}
-Ces quatre tableau offre dans leur ensemble une idée assez claire de la situation ; et il est juste de pouvoir dire que le modèle génératif est ici un meilleur modèle que le modèle discriminant. Les deux modèles semblent offrir dans les données un optimum similaire, autour des 5.7\% d'erreur. Cependant la comparaison en temps est, elle, ne porte à aucune hésitation, le modèle génératif restant remarquablement constant dans son temps d'exécution, là où le modèle discriminant prend très rapidement de longues minutes pour offrir un résultat similaire.
+Ces quatre tableau offrent dans leur ensemble une idée assez claire de la situation ; et il est juste de pouvoir dire que le modèle génératif est ici un meilleur modèle que le modèle discriminant. Les deux modèles semblent offrir dans les données un optimum similaire, autour des 5.7\% d'erreur. Cependant la comparaison en temps est, elle, ne porte à aucune hésitation, le modèle génératif restant remarquablement constant dans son temps d'exécution, là où le modèle discriminant prend très rapidement de longues minutes pour offrir un résultat similaire.
 
 \subsection{Conclusion}\label{Conclusion}
-Le problème de l'étiquettage est, dans la pratique, un problème complexe à aborder efficacement. En effet, et comme la plupart des problèmes qu'aborde les sciences du traitement automatique de la langue, c'est un problème qui repose sur des grandes masses de données ; et cela pose plusieurs contraintes. La première, c'est qu'il n'arrive jamais en pratique que cette donnée soit d'une forme pratique et utilisable directement. La seconde, c'est que la moindre complexité algorithmique prend des dimensions astromnomiques très rapidement.
+Le problème de l'étiquetage est, dans la pratique, un problème complexe à aborder efficacement. En effet, et comme la plupart des problèmes qu'abordent les sciences du traitement automatique de la langue, c'est un problème qui repose sur des grandes masses de données ; et cela pose plusieurs contraintes. La première, c'est qu'il n'arrive jamais en pratique que cette donnée soit d'une forme pratique et utilisable directement. La seconde, c'est que la moindre complexité algorithmique prend des dimensions astromnomiques très rapidement en terme de temps d'exécution.
 \paragraph{}
 Ici, nous avons été chanceux ; le corpus à notre disposition était en effet entièrement étiqueté. Cette disposition des choses nous a permis de mettre en place un modèle génératif, qui possède la très grande qualité de fonctionner très vite. Ici le modèle discriminant se trouve inopérant en comparaison, car bien trop lent sur des instances de plus en plus grandes.
 \paragraph{}
-On serait tenté de qualifier un algorithme comme le perceptron inefficace quant au problème d'étiquettage ; cependant, les choses sont un peu plus complexes. En effet, les corpus entièrement étiquetés sont dans la pratique extrêmement rares et les informaticiens doivent constamment jouer avec données dont ils ne savent pas tout. Bien souvent les modèles génératifs sont trop simplistes pour fonctionner, car trop exigeants sur la forme du corpus. \\
+On serait tenté de qualifier un algorithme comme le perceptron inefficace quant au problème d'étiquetage ; cependant, les choses sont un peu plus complexes. En effet, les corpus entièrement étiquetés sont dans la pratique extrêmement rares et les informaticiens doivent constamment jouer avec données dont ils ne savent pas tout. Bien souvent les modèles génératifs sont trop simplistes pour fonctionner, car trop exigeants sur la forme du corpus. \\
 \paragraph{}
 Dans un exemple comme celui de ce projet, un modèle génératif comme nous l'avons implémenté est sans aucun doute le meilleur compromis de temps et de résultat. Essayer quelque chose d'autre, comme un perceptron, ce serait faire la même chose en moins bien ; les données dont nous disposons sont suffisament riches pour faire des prédictions précises après un simple comptage. Cependant dans la pratique les données sont toujours plus difficile à exploiter. Les modèles génératifs sont ainsi inopérants. L'informaticien, s'il veut pouvoir effectuer des prédictions et des calculs sur le langage, doit savoir s'armer dans la pratique d'outils plus complexes.
 
