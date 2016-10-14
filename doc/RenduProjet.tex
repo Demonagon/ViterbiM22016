@@ -359,42 +359,33 @@ Suite à l'implémentation de ce programme, nous avons collecté des résultats sur 
 
 \subsection{Résultats via le modèle génératif}\label{résultatsgénératif}
 
-Nos tests s'articulent autour de deux paramètres : le paramètre de lissage $\alpha$ et le paramètre de taille de corpus $c$. Pour chacune de ces variations, nous donnerons une table correspondant aux performances d'étiquettage, et une table de performance relative en temps.
-
-%c=1 :
-%a=0 60.7% 2.88s
-%a=0.1 94.4% 3.00s
-%a=0.2 94.2% 3.00s
-%a=0.3 94.3% 3.00s
-%a=0.4 94.1% 3.00s
-%a=0.5 94.0% 3.00s
-%a=0.6 3.01s
+Nos tests s'articulent autour de deux paramètres : le paramètre de lissage $\alpha$ et le paramètre de taille de corpus $c$. Pour chacune de ces variations, nous donnerons une table correspondant aux performances d'étiquettage, et une table de performance en temps.
 
 \begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
 \hline
 Valeurs d'$\alpha$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
-$\alpha = 0.0$ & $60.7\%$ & $58.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.0$ & $60.7\%$ & $58.4\%$ & $56.0\%$ & $53.9\%$ & $51.6\%$ & $48.9\%$ & $45.5\%$ \\
 \hline
-$\alpha = 0.1$ & $94.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.1$ & $94.4\%$ & $94.3\%$ & $94.1\%$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.3\%$ \\
 \hline
-$\alpha = 0.2$ & $94.2\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.2$ & $94.2\%$ & $94.2\%$ & $94.0\%$ & $94.0\%$ & $93.9\%$ & $93.6\%$ & $93.3\%$ \\
 \hline
-$\alpha = 0.3$ & $94.3\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.3$ & $94.3\%$ & $94.1\%$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.0\%$ \\
 \hline
-$\alpha = 0.4$ & $94.1\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.4$ & $94.1\%$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.3\%$ & $xxx\%$ \\
 \hline
-$\alpha = 0.5$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.5$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.3\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$\alpha = 0.6$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.6$ & $94.0\%$ & $93.6\%$ & $93.6\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$\alpha = 0.7$ & $93.9\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.7$ & $93.9\%$ & $93.6\%$ & $93.5\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$\alpha = 0.8$ & $93.7\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.8$ & $93.7\%$ & $93.4\%$ & $93.3\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$\alpha = 0.9$ & $93.6\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 0.9$ & $93.6\%$ & $93.3\%$ & $93.1\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$\alpha = 1.0$ & $93.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$\alpha = 1.0$ & $93.4\%$ & $93.2\%$ & $93.0\%$ & $92.7\%$ & $92.3\%$ & $92.0\%$ & $91.4\%$ \\
 \hline
 \end{tabular}
 
@@ -402,62 +393,55 @@ $\alpha = 1.0$ & $93.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $x
 \hline
 Valeurs d'$\alpha$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
-$\alpha = 0.0$ & $2.88s$ & $2.87s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.0$ & $2.88s$ & $2.87s$ & $2.88s$ & $2.87s$ & $2.86s$ & $2.85s$ & $2.85s$ \\
 \hline
-$\alpha = 0.1$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.1$ & $3.00s$ & $2.99s$ & $2.99s$ & $3.00s$ & $2.99s$ & $2.99s$ & $2.99s$ \\
 \hline
-$\alpha = 0.2$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.2$ & $3.00s$ & $3.00s$ & $2.99s$ & $3.00s$ & $2.99s$ & $2.99s$ & $3.01s$ \\
 \hline
-$\alpha = 0.3$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.3$ & $3.00s$ & $3.00s$ & $3.00s$ & $2.99s$ & $2.98s$ & $2.98s$ & $2.98s$ \\
 \hline
-$\alpha = 0.4$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.4$ & $3.00s$ & $3.00s$ & $3.00s$ & $2.99s$ & $3.00s$ & $2.99s$ & $xxxs$ \\
 \hline
-$\alpha = 0.5$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.5$ & $3.00s$ & $3.00s$ & $3.05s$ & $3.01s$ & $3.01s$ & $xxxs$ & $xxxs$ \\
 \hline
-$\alpha = 0.6$ & $3.01s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.6$ & $3.01s$ & $3.00s$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
-$\alpha = 0.7$ & $3.01$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.7$ & $3.01$ & $3.00s$ & $2.99s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
-$\alpha = 0.8$ & $3.00$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.8$ & $3.00$ & $3.00s$ & $3.07s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
-$\alpha = 0.9$ & $3.03s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 0.9$ & $3.03s$ & $3.00s$ & $2.99s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
-$\alpha = 1.0$ & $2.99s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$\alpha = 1.0$ & $2.99s$ & $2.98s$ & $2.98s$ & $2.97s$ & $2.98s$ & $2.98s$ & $2.97s$ \\
 \hline
 \end{tabular}
 
 \subsection{Résultats via le modèle discriminant}\label{résultatsdiscriminant}
 
-%c=1 :
-%I=10 94.3% 146.1s
-%I=9 93.8% 131.3s
-%I=8 94.0% 117.3s
-%I=7 94.0% 102.9s
-%I=6 94.1% 88.75s
-%I=5 94.0% 74.30s
 \begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
 \hline
 Valeurs de $I$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
-$I = 10$ & $94.3\%$ & $93.7\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I = 10$ & $94.3\%$ & $93.7\%$ & $94.0\%$ & $93.1\%$ & $92.0\%$ & $92.3\%$ & $91.5\%$ \\
 \hline
-$I =  9$ & $93.8\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  9$ & $93.8\%$ & $93.1\%$ & $93.5\%$ & $93.0\%$ & $93.5\%$ & $92.0\%$ & $92.0\%$ \\
 \hline
-$I =  8$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  8$ & $94.0\%$ & $93.2\%$ & $93.1\%$ & $93.1\%$ & $93.0\%$ & $92.4\%$ & $91.9\%$ \\
 \hline
-$I =  7$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  7$ & $94.0\%$ & $93.5\%$ & $93.8\%$ & $92.6\%$ & $93.4\%$ & $93.4\%$ & $91.9\%$ \\
 \hline
-$I =  6$ & $94.1\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  6$ & $94.1\%$ & $93.0\%$ & $93.0\%$ & $92.5\%$ & $93.0\%$ & $91.4\%$ & $xxx\%$ \\
 \hline
-$I =  5$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  5$ & $94.0\%$ & $93.0\%$ & $93.5\%$ & $92.8\%$ & $91.6\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$I =  4$ & $93.5\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  4$ & $93.5\%$ & $92.6\%$ & $93.3\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$I =  3$ & $92.9\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  3$ & $92.9\%$ & $92.8\%$ & $93.6\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$I =  2$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  2$ & $94.0\%$ & $92.8\%$ & $93.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
-$I =  1$ & $91.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+$I =  1$ & $91.4\%$ & $92.0\%$ & $89.7\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
 \hline
 \end{tabular}
 
@@ -465,25 +449,25 @@ $I =  1$ & $91.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ 
 \hline
 Valeurs de $I$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
-$I = 10$ & $146s$ & $131.1s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I = 10$ & $146s$ & $131s$ & $117s$ & $103s$ & $88.4s$ & $74.4s$ & $59.7s$ \\
 \hline
-$I =  9$ & $131s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  9$ & $131s$ & $118s$ & $106s$ & $92.8s$ & $79.9s$ & $67.1s$ & $54.2s$ \\
 \hline
-$I =  8$ & $117s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  8$ & $117s$ & $105s$ & $94.2s$ & $82.7s$ & $71.4s$ & $59.9s$ & $48.5s$ \\
 \hline
-$I =  7$ & $103s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  7$ & $103s$ & $92.4s$ & $82.9s$ & $72.6s$ & $62.8s$ & $52.6s$ & $42.7s$ \\
 \hline
-$I =  6$ & $88.8s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  6$ & $88.8s$ & $80.0s$ & $71.4s$ & $62.7s$ & $54.1s$ & $45.6s$ & $xxxs$ \\
 \hline
-$I =  5$ & $74.3s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  5$ & $74.3s$ & $67.0s$ & $59.9s$ & $52.8s$ & $45.6s$ & $xxxs$ & $xxxs$ \\
 \hline
-$I =  4$ & $60.0s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  4$ & $60.0s$ & $54.1s$ & $48.4s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
-$I =  3$ & $45.7s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  3$ & $45.7s$ & $41.4s$ & $37.0s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
-$I =  2$ & $31.3s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  2$ & $31.3s$ & $28.5s$ & $25.6s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
-$I =  1$ & $17.1s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+$I =  1$ & $17.1s$ & $15.6s$ & $14.1s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
 \hline
 \end{tabular}
 
