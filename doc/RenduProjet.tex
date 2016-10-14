@@ -146,10 +146,30 @@ Derrière un score se cache un procédé qui donne un ordre d'importance numérique 
 \paragraph{}
 Notre approche du problème de l'étiquettage sera de d'abord calculer l'ensemble de ces scores suivant une certaine méthode grâce à un corpus d'apprentissage, puis d'appliquer l'algorithme de Viterbi pour calculer un ensemble d'étiquettes sur un corpus de test. Heureusement, avec l'énoncé de ce projet nous ont été fournis un corpus d'apprentissage et un corpus de test en bonnes formes et entièrement étiquetés, ce qui simplifie grandement le travail d'étiquettage automatique.
 
-\paragraph{}
-Reste à savoir comment extraire du corpus d'apprentissage les scores en question. Deux modèles différents de cette extraction seront abordés lors de ce projet : un modèle génératif basé sur un calcul de probabilités, et un modèle discriminant basé sur un algorithme de perceptron.
+\subsection{L'algorithme de Viterbi}\label{modèleviterbi}
+L'algorithme de Viterbi est un algorithme classique de programmation dynamique de calcul sur les treillis, ici utilisé pour calculer la meilleure séquence d'étiquette sans avoir à considérer un nombre exponentiel d'éléments. Le voici sous une version proche de celle implémentée dans le projet :
+\begin{enumerate}
+\item Soit O la séquence d'observables de taille N, et $\pi_i$, $a_{ij}$ et $b_i(j)$ les fonctions de score contenues dans un HMM. On pose K le nombre d'étiquettes différentes.
+\item On considèrera SCORE et BACKTRACK deux tableaux de dimension 2 et de taille $N \times K$.
+\item $\forall i \in K, SCORE[i, 1] \leftarrow \pi_i \times b_i(O_1), BACKTRACK[i, 1] \leftarrow 0$
+\item $\forall i$ de $2$ à $N$, $\forall j$ de $1$ à $K$ :
+	\begin{enumerate}
+	\item $SCORE[j, i] \leftarrow max_{k} (SCORE[k, i-1] \times a_{kj} \times b_{jq_i} )$
+	\item $BACKTRACK[j, i] \leftarrow arg\ max_{k} (SCORE[k, i-1] \times a_{kj} )$
+	\end{enumerate}
+\item Soit $Q = q_1, q_2, \ldots, q_N$ une séquence d'étiquette.
+\item $q_N \leftarrow S_{arg\ max_{k} (SCORE[k, N])}$
+\item $\forall i$ de $N$ à $2$ :
+	\begin{enumerate}
+	\item $q_{i - 1} \leftarrow S_{BACKTRACK[q_i, i]}$
+	\end{enumerate}
+\item retourner $Q$.
+\end{enumerate}
 
-\subsection{Modèle génératif}
+\paragraph{}
+Reste à savoir comment extraire du corpus d'apprentissage les scores utilisés dans l'algorithme. Deux modèles différents de cette extraction seront abordés lors de ce projet : un modèle génératif basé sur un calcul de probabilités, et un modèle discriminant basé sur un algorithme de perceptron.
+
+\subsection{Modèle génératif}\label{modèlegénératif}
 Ce modèle considère nos scores de la façon suivante :
 \begin{itemize}
 \item Scores initiaux : \[\pi_i = -\ log\ P(q_1 = S_i) \approx -\ log\ \ddfrac{C_\pi(S_i) + \alpha}{Nb_{sentences} + N \times \alpha }\]
@@ -178,7 +198,7 @@ Le paramètre de lissage $\alpha$ fait partie des améliorations ajoutées au modèl
 \paragraph{}
 Ce modèle est très simple, car il n'exige qu'une seule lecture du corpus d'apprentissage, sur lequel il effectue un calcul de complexité linéaire.
 
-\subsection{Modèle discriminant}
+\subsection{Modèle discriminant}\label{modèlediscriminant}
 Ce second modèle, de type discriminant, emploie une solution plus complexe algorithmiquement ; plutôt que d'extraire directement les scores du corpus, on approxime leurs valeurs grâce à un algorithme de perceptron. Le vecteur de poids du perceptron considéré contiendra donc l'ensemble de nos scores $\pi_i$, $a_{ij}$ et $b_i(j)$.
 
 \paragraph{}
@@ -217,33 +237,255 @@ Avec, par ordre d'apparition :
 Ce perceptron diminue à chaque itération les poids correspondant à l'étiquettage réelle, et augmente les poids correspondant à l'étiquettage approximé. Cela résulte en un calcul bien plus complexe que pour le modèle précédent, qui cependant affecte bien les scores minimaux aux évènements les plus probables.
 
 \section{Implémentation}\label{Implémentation}
-Notre implémentation a été réalisée en langage C, choisi pour son efficacité algorithmique. Le code qui a été produit dans le cadre de ce projet se divise en dix modules : data, evaluation, hmm, hmm init, log sum, main, parameters, parser, perceptron et viterbi. Chacun de ces modules possède un fichier en extension .h et un fichier en extension .c qui lui correspond dans le dossier src. Afin de détailler notre implémentation, nous allons présenter ces modules un à un, dans l'ordre de complexité.
+Notre implémentation a été réalisée en langage C, choisi pour son efficacité algorithmique. Le code qui a été produit dans le cadre de ce projet se divise en dix modules : data, evaluation, hmm, hmm init, log sum, main, parameters, parser, perceptron et viterbi. Chacun de ces modules possède un fichier en extension .h et un fichier en extension .c qui lui correspondent dans le dossier src. Afin de détailler notre implémentation, nous allons présenter ces modules un à un, dans l'ordre de complexité.
 \subparagraph{}
 Il est à noter que chacun des fichier de ce projet dispose de commentaires qui présentent les différentes fonctions et expliquent le fonctionnement interne des fonctions les plus algorithmiques.
 
 \subsection{Module log sum}\label{log sum}
 
+Le module log sum est sans doute le module le plus simple de l'ensemble du projet. Il donne accès à de très simples fonctions de calcul de probabilités sous forme logarithmique. Il permet notamment de diviser un nombre par un autre afin d'obtenir une probabilité sous forme logarithmique négative, et de multiplier deux probabilités sous forme logarithmique.
+
 \subsection{Module parameters}\label{parameters}
+
+Le travail de ce module est de prendre en charge les paramètres données en ligne de commande par l'utilisateur, et de stocker les informations intéressantes sous la forme d'une structure donnée. Les paramètres retenus dans la structure sont les suivants :
+\begin{itemize}
+\item Le bruit de l'exécution : silencieux, normal, bruyant. Définit le montant d'affichage console généré par le programme.
+\item Le type d'exécution : seulement le modèle discriminant, seulement le modèle génératif ou les deux en même temps. Nous permettons de tester les deux modèles consécutivement pour une seule lecture du corpus, ce qui permet de gagner beaucoup de temps lors de tests.
+\item c : chiffre flottant dans $[0, 1]$, qui correspond au ratio du nombre de phrases du corpus d'apprentissage qui sera effectivement lu et enregistré. (Voir \ref{hmm init} et \ref{perceptron} pour l'utilisation de ce paramètre en pratique)
+\item I : la constante qui indique le nombre d'itérations de l'algorithme perceptron.
+\item $\alpha$ : la constante de lissage utilisée dans le modèle génératif. (Voir \ref{modèlegénératif}, \ref{hmm init})
+\end{itemize}
+Tout ces paramètres peuvent être affectés par des paramètres en ligne de commande :
+\begin{itemize}
+\item Bruit : -s implique une exécution silencieuse, -v implique une exécution bruyante. Par défaut le bruit de l'exécution est normal.
+\item Type d'exécution : -C force le programme à travailler seulement sur un modèle génératif, -P force le programme à fonctionner seulement avec un modèle discriminant. Par défaut le programme exécutera les deux modèles à la suite.
+\item c : $-c=x$ affecte à x ce paramètre. Par défaut c possède une valeur de 1, ce qui implique que le programme lira par défaut tout le corpus lors de l'apprentissage.
+\item I : $-I=x$ affecte à x ce paramètre. Par défaut I vaut 10, ce qui implique 10 itérations de l'algorithme perceptron dans le cas où le modèle génératif est pris en compte.
+\item $\alpha$ : $-a=x$ affecte à x ce paramètre. Par défaut $\alpha$ est affecté à 0, ce qui implique que le modèle génératif ne pratique pas de lissage par défaut.
+\end{itemize}
+
+\subparagraph{}
+Il faut également mentionner que l'exécution du programme requiert l'usage de deux paramètres obligatoires, qui correspondent aux corpus d'apprentissage et de test. Plus de détails sur l'utilisation pratique du projet sont disponible dans le readme.txt.
+
+\paragraph{}
+Ces paramètres sont lus au tout début de l'exécution du programme, puis sont disponible d'accès pour tout le reste de l'exécution grâce à la structure de donnée détaillée juste après.
 
 \subsection{Module data}\label{data}
 
+Ce module rend accessible un ensemble d'informations cruciales à l'ensemble des modules suivants sous la forme du structure de donnée qui sera passée en paramètre de nombre de fonctions. Cette structure de donnée englobe les choses suivantes :
+\begin{itemize}
+\item L'ensemble des paramètres du programmes (détaillés en \ref{parameters})
+\item Les informations détaillées du corpus d'apprentissage, qui peuvent être décrites par :
+	\begin{itemize}
+	\item Une séquence de mots
+	\item Une séquence d'étiquettes
+	\item La longueur de ces deux séquences
+	\item Le nombre de phrases comprises dans ce corpus
+	\end{itemize}
+\item Les informations détaillées du corpus de test, qui peuvent être décrites par :
+	\begin{itemize}
+	\item Une séquence de mots
+	\item Une séquence d'étiquettes
+	\item La longueur de ces deux séquences
+	\item Le nombre de phrases comprises dans ce corpus
+	\end{itemize}
+\end{itemize}
+
+\paragraph{}
+Ce module est également le module qui prend en charge la lecture des corpus d'apprentissage et de test à partir des chemins donnés en paramètres du programme. Ce design permet une lecture minimale des fichiers, ici réduite à deux parcours par fichiers. Les fonctions du module parser (\ref{parser}) sont ici employées.
+
 \subsection{Module hmm}\label{hmm}
+
+Ce module fournit une structure de donnée représentant les scores d'un modèle caché de Markov. Ces différends scores, $\pi_i$, $a_{ij}$ et $b_i(j)$, sont cruciaux dans notre projet. Ils sont stockés dans la structure proposée par ce module et sont manipulés exclusivement par elle.
 
 \subsection{Module parser}\label{parser}
 
+Ce module fournit un ensemble de fonctions pratique permettant la lecture d'un fichier. Il permet notamment d'extraire simultanément en un nombre minimal de parcours le nombre de lignes du fichier, la liste de mots qu'il contient, la liste d'étiquettes correspondant à ces mots qu'il contient, et le nombre de phrases contenues. Les fichiers acceptés sont de la forme suivante :
+\begin{align*}
+O_{1_1}&\; q_{1_1} \\
+O_{1_2}&\; q_{1_2} \\
+\cdots&\cdots \\
+O_{1_{n_1}}&\; q_{1_{n_1}} \\
+\\
+O_{2_1}&\; q_{2_1} \\
+O_{2_1}&\; q_{2_1} \\
+\cdots&\cdots \\
+O_{2_{n_2}}&\; q_{2_{n_2}} \\
+\\
+\cdots&\cdots \\
+\\
+O_{m_1}&\; q_{m_1} \\
+O_{m_2}&\; q_{m_2} \\
+\cdots&\cdots \\
+O_{m_{n_m}}&\; q_{m_{n_m}}
+\end{align*}
+Avec $m$ le nombre de sous séquences, et $n_i$ la taille de la sous séquence $i$.
+
 \subsection{Module viterbi}\label{viterbi}
+
+Ce module est sans doute le plus important, puisqu'il implémente l'algorithme de Viterbi. Il s'agit d'un algorithme déjà détaillé dans ce rapport dans la partie \ref{modèleviterbi}, nous n'ajouterons donc pas grand chose dans la présente section.
 
 \subsection{Module hmm init}\label{hmm init}
 
+Ce module a pour principale mission d'initialiser les paramètres du HMM d'après les règles du modèle génératif. C'est en effet dans ce module que sont présentes les fonctions comptant les occurences d'évènements dans le corpus d'apprentissage. Pour ce faire, le module hmm init utilise une structure de donnée permettant de retenir les informations suivantes au fur et à mesure de la lecture :
+\begin{itemize}
+\item Le nombre d'états différends $K$
+\item Le nombre d'observables différends $V$
+\item La taille de la séquence total lue $N$
+\item Un tableau de taille $K$ contenant les occurences de chaque étiquette en début de phrase
+\item Le nombre de phrases $M$
+\item Un tableau de dimension 2 et de taille $K \times K$ contenant les occurences de transition d'état
+\item Un tableau de dimension 2 et de taille $K \times V$ contenant les occurences d'émissions
+\item Un tableau de taille $K$ contenat les occurences d'apparition totale de chaque état
+\end{itemize}
+Ces informations sont accumulées pour chaque phrase du corpus lues séparément. Elle sont enfin utilisées à la fin de la lecture pour générer les scores du HMM comme décrit dans la section \ref{modèlegénératif}.
+
 \subsection{Module perceptron}\label{perceptron}
+
+Ce module a pour principale mission d'initialiser les paramètres du HMM d'après les règles du modèle discriminant. C'est ici que l'on va trouver l'implémentation de l'algorithme perceptron explicité en section \ref{modèlediscriminant}.
 
 \subsection{Module main}\label{main}
 
+Enfin, le module main contient la fonction principale du programme. Cette fonction effectue les opérations suivantes :
+\begin{enumerate}
+\item Initialisation d'une structure de données DATA en fonction des paramètres en ligne de commande (Voir \ref{data})
+\item Si les paramètres d'exécution le demandent, exécuter l'algorithme de viterbi par modèle génératif
+\item Et si les paramètres d'exécution le demandent, exécuter l'algorithme de viterbi par modèle discriminant
+\end{enumerate}
+
 \section{Résultats}\label{Résultats}
 
-\subsection{Résultats via le modèle génératif}\label{résultatsgénératifs}
+Suite à l'implémentation de ce programme, nous avons collecté des résultats sur les différends modèles et en faisant varier nos paramètres. La section qui va suivre va détailler ces résultats et fournir une conclusion simple sur chacun d'entre eux. Nous conclurons enfin ce rapport en prenant un peu de recul sur l'ensemble de ces résultats, et de leur signification dans le cadre du travail demandé.
+
+\subsection{Résultats via le modèle génératif}\label{résultatsgénératif}
+
+Nos tests s'articulent autour de deux paramètres : le paramètre de lissage $\alpha$ et le paramètre de taille de corpus $c$. Pour chacune de ces variations, nous donnerons une table correspondant aux performances d'étiquettage, et une table de performance relative en temps.
+
+%c=1 :
+%a=0 60.7% 2.88s
+%a=0.1 94.4% 3.00s
+%a=0.2 94.2% 3.00s
+%a=0.3 94.3% 3.00s
+%a=0.4 94.1% 3.00s
+%a=0.5 94.0% 3.00s
+%a=0.6 3.01s
+
+\begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
+\hline
+Valeurs d'$\alpha$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+\hline\hline
+$\alpha = 0.0$ & $60.7\%$ & $58.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.1$ & $94.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.2$ & $94.2\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.3$ & $94.3\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.4$ & $94.1\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.5$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.6$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.7$ & $93.9\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.8$ & $93.7\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 0.9$ & $93.6\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$\alpha = 1.0$ & $93.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+\end{tabular}
+
+\begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
+\hline
+Valeurs d'$\alpha$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+\hline\hline
+$\alpha = 0.0$ & $2.88s$ & $2.87s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.1$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.2$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.3$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.4$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.5$ & $3.00s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.6$ & $3.01s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.7$ & $3.01$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.8$ & $3.00$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 0.9$ & $3.03s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$\alpha = 1.0$ & $2.99s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+\end{tabular}
 
 \subsection{Résultats via le modèle discriminant}\label{résultatsdiscriminant}
+
+%c=1 :
+%I=10 94.3% 146.1s
+%I=9 93.8% 131.3s
+%I=8 94.0% 117.3s
+%I=7 94.0% 102.9s
+%I=6 94.1% 88.75s
+%I=5 94.0% 74.30s
+\begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
+\hline
+Valeurs de $I$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+\hline\hline
+$I = 10$ & $94.3\%$ & $93.7\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  9$ & $93.8\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  8$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  7$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  6$ & $94.1\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  5$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  4$ & $93.5\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  3$ & $92.9\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  2$ & $94.0\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+$I =  1$ & $91.4\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ & $xxx\%$ \\
+\hline
+\end{tabular}
+
+\begin{tabular}{| c || c | c | c | c | c | c | c | c | c | c |}
+\hline
+Valeurs de $I$ & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
+\hline\hline
+$I = 10$ & $146s$ & $131.1s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  9$ & $131s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  8$ & $117s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  7$ & $103s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  6$ & $88.8s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  5$ & $74.3s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  4$ & $60.0s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  3$ & $45.7s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  2$ & $31.3s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+$I =  1$ & $17.1s$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ & $xxxs$ \\
+\hline
+\end{tabular}
 
 \subsection{Conclusion}\label{Conclusion}
 
