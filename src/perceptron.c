@@ -1,5 +1,9 @@
 #include "perceptron.h"
 
+/**
+* Cette fonction renvoie vrai s'il existe une différence entre les tableaux
+* real_labels et approx_labels.
+*/
 char is_prediction_wrong_perceptron(int * real_labels,
 									int * approx_labels,
 									int size) {
@@ -8,6 +12,10 @@ char is_prediction_wrong_perceptron(int * real_labels,
 	return 0;
 }
 
+/**
+* Cette fonction met à jour les valeurs des scores a_ij du hmm en fonction des
+* valeurs des transitions dans real_labels et approximated_labels.
+*/
 void update_transition(Hmm * hmm, int * real_labels, int * approximated_labels,
 					   int size) {
 	int previous_real_state = real_labels[0] - 1;
@@ -22,6 +30,11 @@ void update_transition(Hmm * hmm, int * real_labels, int * approximated_labels,
 	}
 }
 
+/**
+* Cette fonction met à jour les valeurs des scores b_i(j) du hmm en fonction des
+* valeurs d'emission dans real_labels et approximated_labels sur les mots
+* dans words.
+*/
 void update_emission(Hmm * hmm, int * words,
 					 int * real_labels, int * approximated_labels,
 					 int size) {
@@ -34,13 +47,20 @@ void update_emission(Hmm * hmm, int * words,
 	}
 }
 
+/**
+* Cette fonction met à jour les score pi_i du hmm en fonction de la première
+* étiquette de real_labels et approximated_lables.
+*/
 void update_initial(Hmm * hmm, int * real_labels, int * approximated_labels) {
 	hmm->PI[real_labels[0] - 1]--;
 	hmm->PI[approximated_labels[0] - 1]++;
-	/*printf("PI[%d] --\n", real_labels[0] - 1);
-	printf("PI[%d] ++\n", approximated_labels[0] - 1);*/
 }
 
+/**
+* Cette fonction met à jour les scores du hmm en fonction des tableaux words,
+* real_labels et approximated_labels. Pour cela elle utilise simplement les 
+* trois fonctions précédentes.
+*/
 void update_perceptron(Hmm * hmm, int * words, int * real_labels,
 					   int * approximated_labels, int size) {
 	update_transition(hmm, real_labels, approximated_labels, size);
@@ -48,9 +68,14 @@ void update_perceptron(Hmm * hmm, int * words, int * real_labels,
 	update_initial(hmm, real_labels, approximated_labels);
 }
 
+/**
+* Exécute l'algorithme du perceptron sur le corpus d'apprentissage sur le hmm
+* passé en argument.
+*/
 void perceptron_compute_corpus(Hmm * hmm) {
 	GlobalData * data = hmm->data;
 
+	// Récupération des données d'apprentissage
 	int size = data->learning_size;
 	int * words = data->learning_words;
 	int * real_labels = data->learning_labels;
@@ -60,8 +85,10 @@ void perceptron_compute_corpus(Hmm * hmm) {
 		fflush( stdout );
 	}
 
+	// Déclaration des étiquettes approximées
 	int approximated_labels[size];
 
+	// Déclaration du paramètre I
 	int I = data->execution_parameters.perceptron_iteration_number;
 
 	int progress_state = 0;
@@ -72,6 +99,7 @@ void perceptron_compute_corpus(Hmm * hmm) {
 		fflush( stdout );
 	}
 
+	// On effectue la suite I fois
 	for(int i = 0; i < I; i++) {
 
 		/* Affichage de la progression.*/
