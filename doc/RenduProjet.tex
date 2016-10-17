@@ -5,8 +5,8 @@
 %% HEADER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[a4paper,oneside,12pt]{article}
-%\setlength{\oddsidemargin}{5mm}
-%\setlength{\evensidemargin}{5mm}
+%\setlength{\oddsidemargin}{3mm}
+%\setlength{\evensidemargin}{3mm}
 % Alternative Options:
 %	Paper Size: a4paper / a5paper / b5paper / letterpaper / legalpaper / executivepaper
 % Duplex: oneside / twoside
@@ -14,6 +14,7 @@
 
 
 %% Language %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{geometry}
 \usepackage[francais]{babel} %francais, polish, spanish, ...
 \usepackage[T1]{fontenc}
 \usepackage[ansinew]{inputenc}
@@ -41,9 +42,22 @@
 %% Math Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{amsmath}
 \usepackage{amsthm}
-\usepackage{amsfonts}\usepackage{enumitem}
+\usepackage{amsfonts}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{plotmarks}
 \setlist[enumerate]{label*=\arabic*.}
 \newcommand\ddfrac[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+
+%\usepackage[usenames, dvipsnames]{color}
+
+%
+
+\definecolor{mydarkred}{rgb}{0.6, 0, 0}
+\definecolor{mydarkgreen}{rgb}{0, 0.5, 0}
+\definecolor{mydarkblue}{rgb}{0, 0, 0.5}
+
+\geometry{hscale=0.65,vscale=0.80,centering}
 
 
 %% Line Spacing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -372,19 +386,19 @@ La première table que nous allons consulter représente les résultats en efficaci
 \hline
 \% de précision & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
-$\alpha = 0.0$ & $60.7\%$ & $58.4\%$ & $56.0\%$ & $53.9\%$ & $51.6\%$ & $48.9\%$ & $45.5\%$ \\
+$\alpha = 0.0$ & \textcolor{mydarkred}{$\textbf{60.7\%}$} & \textcolor{mydarkred}{$\textbf{58.4\%}$} & \textcolor{mydarkred}{$\textbf{56.0\%}$} & \textcolor{mydarkred}{$\textbf{53.9\%}$} & \textcolor{mydarkred}{$\textbf{51.6\%}$} & \textcolor{mydarkred}{$\textbf{48.9\%}$} & \textcolor{mydarkred}{$\textbf{45.5\%}$} \\
 \hline
-$\alpha = 0.1$ & $94.4\%$ & $94.3\%$ & $94.1\%$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.3\%$ \\
+$\alpha = 0.1$ & \textcolor{mydarkgreen}{$94.4\%$} & \textcolor{mydarkgreen}{$94.3\%$} & \textcolor{mydarkgreen}{$94.1\%$} & \textcolor{mydarkgreen}{$94.0\%$} & $93.8\%$ & $93.6\%$ & $93.3\%$ \\
 \hline
-$\alpha = 0.2$ & $94.2\%$ & $94.2\%$ & $94.0\%$ & $94.0\%$ & $93.9\%$ & $93.6\%$ & $93.3\%$ \\
+$\alpha = 0.2$ & \textcolor{mydarkgreen}{$94.2\%$} & \textcolor{mydarkgreen}{$94.2\%$} & \textcolor{mydarkgreen}{$94.0\%$} & \textcolor{mydarkgreen}{$94.0\%$} & $93.9\%$ & $93.6\%$ & $93.3\%$ \\
 \hline
-$\alpha = 0.3$ & $94.3\%$ & $94.1\%$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.0\%$ \\
+$\alpha = 0.3$ & \textcolor{mydarkgreen}{$94.3\%$} & \textcolor{mydarkgreen}{$94.1\%$} & \textcolor{mydarkgreen}{$94.0\%$} & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.0\%$ \\
 \hline
-$\alpha = 0.4$ & $94.1\%$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.3\%$ & $92.9\%$ \\
+$\alpha = 0.4$ & \textcolor{mydarkgreen}{$94.1\%$} & \textcolor{mydarkgreen}{$94.0\%$} & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.3\%$ & $92.9\%$ \\
 \hline
-$\alpha = 0.5$ & $94.0\%$ & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.3\%$ & $93.1\%$ & $92.6\%$ \\
+$\alpha = 0.5$ & \textcolor{mydarkgreen}{$94.0\%$} & $93.8\%$ & $93.6\%$ & $93.4\%$ & $93.3\%$ & $93.1\%$ & $92.6\%$ \\
 \hline
-$\alpha = 0.6$ & $94.0\%$ & $93.6\%$ & $93.6\%$ & $93.3\%$ & $93.2\%$ & $92.8\%$ & $92.4\%$ \\
+$\alpha = 0.6$ & \textcolor{mydarkgreen}{$94.0\%$} & $93.6\%$ & $93.6\%$ & $93.3\%$ & $93.2\%$ & $92.8\%$ & $92.4\%$ \\
 \hline
 $\alpha = 0.7$ & $93.9\%$ & $93.6\%$ & $93.5\%$ & $93.2\%$ & $92.9\%$ & $92.6\%$ & $92.1\%$ \\
 \hline
@@ -395,6 +409,10 @@ $\alpha = 0.9$ & $93.6\%$ & $93.3\%$ & $93.1\%$ & $92.8\%$ & $92.5\%$ & $92.2\%$
 $\alpha = 1.0$ & $93.4\%$ & $93.2\%$ & $93.0\%$ & $92.7\%$ & $92.3\%$ & $92.0\%$ & $91.4\%$ \\
 \hline
 \end{tabular}
+
+%\begin{tikzpicture}[y=.2cm, x=.7cm,font=\sffamily]
+%Dessiner un graphe des valeurs
+%\end{tikzpicture}
 
 \paragraph{}
 Par observation, on sépare ces résultats en deux parties, constituées par :
@@ -459,25 +477,25 @@ Jetons pour commencer un regard sur ce tableau répertoriant les pourcentages de 
 \hline
 \% de précision & c = 1.0 & c = 0.9 & c = 0.8 & c = 0.7 & c = 0.6 & c = 0.5 & c = 0.4 \\
 \hline\hline
-$I = 10$ & $94.3\%$ & $93.7\%$ & $94.0\%$ & $93.1\%$ & $92.0\%$ & $92.3\%$ & $91.5\%$ \\
+$I = 10$ & \textcolor{mydarkgreen}{$94.3\%$} & $93.7\%$ & \textcolor{mydarkgreen}{$94.0\%$} & $93.1\%$ & $92.0\%$ & $92.3\%$ & $91.5\%$ \\
 \hline
 $I =  9$ & $93.8\%$ & $93.1\%$ & $93.5\%$ & $93.0\%$ & $93.5\%$ & $92.0\%$ & $92.0\%$ \\
 \hline
-$I =  8$ & $94.0\%$ & $93.2\%$ & $93.1\%$ & $93.1\%$ & $93.0\%$ & $92.4\%$ & $91.9\%$ \\
+$I =  8$ & \textcolor{mydarkgreen}{$94.0\%$} & $93.2\%$ & $93.1\%$ & $93.1\%$ & $93.0\%$ & $92.4\%$ & $91.9\%$ \\
 \hline
-$I =  7$ & $94.0\%$ & $93.5\%$ & $93.8\%$ & $92.6\%$ & $93.4\%$ & $93.4\%$ & $91.9\%$ \\
+$I =  7$ & \textcolor{mydarkgreen}{$94.0\%$} & $93.5\%$ & $93.8\%$ & $92.6\%$ & $93.4\%$ & $93.4\%$ & $91.9\%$ \\
 \hline
-$I =  6$ & $94.1\%$ & $93.0\%$ & $93.0\%$ & $92.5\%$ & $93.0\%$ & $91.4\%$ & $92.3\%$ \\
+$I =  6$ & \textcolor{mydarkgreen}{$94.1\%$} & $93.0\%$ & $93.0\%$ & $92.5\%$ & $93.0\%$ & $91.4\%$ & $92.3\%$ \\
 \hline
-$I =  5$ & $94.0\%$ & $93.0\%$ & $93.5\%$ & $92.8\%$ & $91.6\%$ & $92.3\%$ & $91.5\%$ \\
+$I =  5$ & \textcolor{mydarkgreen}{$94.0\%$} & $93.0\%$ & $93.5\%$ & $92.8\%$ & $91.6\%$ & $92.3\%$ & $91.5\%$ \\
 \hline
 $I =  4$ & $93.5\%$ & $92.6\%$ & $93.3\%$ & $92.2\%$ & $92.3\%$ & $93.0\%$ & $90.9\%$ \\
 \hline
 $I =  3$ & $92.9\%$ & $92.8\%$ & $93.6\%$ & $92.6\%$ & $93.0\%$ & $90.4\%$ & $91.8\%$ \\
 \hline
-$I =  2$ & $94.0\%$ & $92.8\%$ & $93.0\%$ & $90.8\%$ & $90.9\%$ & $91.0\%$ & $90.4\%$ \\
+$I =  2$ & \textcolor{mydarkgreen}{$94.0\%$} & $92.8\%$ & $93.0\%$ & $90.8\%$ & $90.9\%$ & $91.0\%$ & $90.4\%$ \\
 \hline
-$I =  1$ & $91.4\%$ & $92.0\%$ & $89.7\%$ & $91.9\%$ & $90.6\%$ & $86.2\%$ & $88.8\%$ \\
+$I =  1$ & $91.4\%$ & $92.0\%$ & \textcolor{mydarkred}{$\textbf{89.7\%}$} & $91.9\%$ & $90.6\%$ & \textcolor{mydarkred}{$\textbf{86.2\%}$} & \textcolor{mydarkred}{$\textbf{88.8\%}$} \\
 \hline
 \end{tabular}
 
